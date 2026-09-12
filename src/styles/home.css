@@ -46,15 +46,34 @@
   width: 48px;
   padding: 7px 4px;
   border-radius: 11px;
-  background: rgba(18, 8, 16, 0.62);
-  border: 1px solid rgba(201, 162, 39, 0.24);
+  background: linear-gradient(168deg, rgba(46, 22, 40, 0.82), rgba(9, 4, 8, 0.9));
+  border: 1px solid rgba(227, 193, 90, 0.5);
+  box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(242, 224, 168, 0.22),
+    inset 0 -9px 14px -11px rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(7px);
   color: var(--parchment);
   transition: all var(--dur) var(--ease);
 }
 
+.rail-btn::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  border: 1px solid rgba(227, 193, 90, 0.16);
+  pointer-events: none;
+}
+
 .rail-btn:hover {
-  border-color: rgba(201, 162, 39, 0.6);
+  border-color: rgba(242, 224, 168, 0.8);
   color: var(--gold-200);
+  box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(242, 224, 168, 0.3),
+    0 0 14px -4px rgba(227, 193, 90, 0.6);
+}
+
+.rail-btn:hover .gicon {
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.7))
+    drop-shadow(0 0 6px rgba(227, 193, 90, 0.7));
 }
 
 .rail-btn span {
@@ -269,6 +288,8 @@
  * Bottom dock
  * ------------------------------------------------------------------ */
 
+/* The dock keeps a plate — it is a navigation surface, not an overlay —
+ * but it reads as smoked glass under a gilt rail, not a painted slab. */
 .dock {
   position: absolute;
   left: 0;
@@ -280,9 +301,30 @@
   align-items: center;
   gap: 8px;
   padding: 0 10px;
-  background: linear-gradient(0deg, #170b13 0%, #1c0d1a 55%, #150910 100%);
-  border-top: 1px solid rgba(227, 193, 90, 0.4);
-  box-shadow: 0 -1px 0 rgba(242, 224, 168, 0.14) inset, 0 -10px 24px -14px rgba(0, 0, 0, 0.9);
+  background: linear-gradient(0deg, rgba(9, 4, 8, 0.94) 0%, rgba(26, 12, 23, 0.86) 100%);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -12px 26px -18px rgba(0, 0, 0, 0.95);
+}
+
+/* Gilt rail: a gold rule that fades out at both ends instead of running
+ * hard into the screen edges. */
+.dock::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 162, 39, 0.5) 12%,
+    rgba(242, 224, 168, 0.9) 50%,
+    rgba(201, 162, 39, 0.5) 88%,
+    transparent
+  );
+  box-shadow: 0 0 12px -2px rgba(227, 193, 90, 0.6);
+  pointer-events: none;
 }
 
 .dock-tabs {
@@ -338,8 +380,17 @@
     0 0 12px -4px rgba(227, 193, 90, 0.4);
 }
 
-.dock-tab.selected svg {
-  filter: drop-shadow(0 0 5px rgba(227, 193, 90, 0.65));
+.dock-tab.selected .gicon {
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.7))
+    drop-shadow(0 0 6px rgba(227, 193, 90, 0.8));
+}
+
+.dock-tab:not(.selected) .gicon {
+  opacity: 0.82;
+}
+
+.dock-tab:hover .gicon {
+  opacity: 1;
 }
 
 .dock-tab .rail-dot {

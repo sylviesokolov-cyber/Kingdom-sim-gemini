@@ -1,27 +1,27 @@
-import {
-  Backpack,
-  Castle,
-  Gem,
-  HeartHandshake,
-  Map,
-  Scale,
-  ShoppingBag,
-  Sunrise,
-  Swords,
-  User,
-} from 'lucide-react';
 import type { ScreenId } from '../../state/store';
+import {
+  IconBonds,
+  IconCastle,
+  IconHelm,
+  IconMap,
+  IconPouch,
+  IconSatchel,
+  IconScales,
+  IconSparkle,
+  IconSunrise,
+  IconSwords,
+} from '../ui/GameIcon';
 
-const TABS: { id: ScreenId; label: string; Icon: typeof Castle }[] = [
-  { id: 'home', label: 'Home', Icon: Castle },
-  { id: 'profile', label: 'Character', Icon: User },
-  { id: 'kingdom', label: 'Kingdom', Icon: Map },
-  { id: 'characters', label: 'Bonds', Icon: HeartHandshake },
-  { id: 'work', label: 'Work', Icon: Swords },
-  { id: 'market', label: 'Market', Icon: ShoppingBag },
-  { id: 'council', label: 'Council', Icon: Scale },
-  { id: 'summon', label: 'Summon', Icon: Gem },
-  { id: 'inventory', label: 'Pack', Icon: Backpack },
+const TABS: { id: ScreenId; label: string; Icon: typeof IconCastle }[] = [
+  { id: 'home', label: 'Home', Icon: IconCastle },
+  { id: 'profile', label: 'Character', Icon: IconHelm },
+  { id: 'kingdom', label: 'Kingdom', Icon: IconMap },
+  { id: 'characters', label: 'Bonds', Icon: IconBonds },
+  { id: 'work', label: 'Work', Icon: IconSwords },
+  { id: 'market', label: 'Market', Icon: IconPouch },
+  { id: 'council', label: 'Council', Icon: IconScales },
+  { id: 'summon', label: 'Summon', Icon: IconSparkle },
+  { id: 'inventory', label: 'Pack', Icon: IconSatchel },
 ];
 
 interface Props {
@@ -42,14 +42,14 @@ export function Dock({ screen, onNavigate, onAdvanceDay, alerts }: Props) {
             onClick={() => onNavigate(id)}
           >
             {alerts[id] && <span className="rail-dot" />}
-            <Icon size={17} />
+            <Icon size={21} tone={screen === id ? 'gold' : 'bronze'} />
             <span>{label}</span>
           </button>
         ))}
       </div>
 
       <button className="btn btn-primary btn-lg next-day" onClick={onAdvanceDay}>
-        <Sunrise size={16} />
+        <IconSunrise size={19} tone="gold" />
         Next Day
       </button>
     </nav>

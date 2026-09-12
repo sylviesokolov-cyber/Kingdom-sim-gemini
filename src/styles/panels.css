@@ -332,9 +332,55 @@
 }
 
 /* ------------------------------------------------------------------ *
+ * Game icons
+ *
+ * The dark keyline under every glyph is painted here rather than drawn
+ * into each path — `paint-order` strokes beneath the fill, so one rule
+ * gives the whole set the struck-metal edge that separates them from art.
+ * ------------------------------------------------------------------ */
+
+.gicon {
+  flex-shrink: 0;
+  paint-order: stroke fill markers;
+  stroke: rgba(9, 3, 8, 0.62);
+  stroke-width: 0.75;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.7));
+  transition: filter var(--dur) var(--ease);
+}
+
+.gicon-gloss {
+  stroke: none;
+}
+
+/* Tone-matched bloom, so a gem reads cold and a heart reads warm. */
+.currency-gold .gicon,
+.hud-clock .gicon {
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.7))
+    drop-shadow(0 0 5px rgba(227, 193, 90, 0.55));
+}
+
+.currency-crystal .gicon {
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.7))
+    drop-shadow(0 0 5px rgba(127, 212, 232, 0.6));
+}
+
+.currency-rose .gicon {
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.7))
+    drop-shadow(0 0 5px rgba(224, 87, 128, 0.6));
+}
+
+.currency-energy .gicon {
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.7))
+    drop-shadow(0 0 5px rgba(79, 157, 105, 0.6));
+}
+
+/* ------------------------------------------------------------------ *
  * Top HUD
  * ------------------------------------------------------------------ */
 
+/* No bar. The HUD is a row of gilt chips floating over the art — the
+ * strip between them is not a surface and does not swallow taps. */
 .hud {
   position: absolute;
   top: 0;
@@ -346,9 +392,40 @@
   align-items: center;
   gap: 12px;
   padding: 0 10px;
-  background: linear-gradient(180deg, #170b13 0%, #1c0d1a 68%, #150910 100%);
-  border-bottom: 1px solid rgba(227, 193, 90, 0.4);
-  box-shadow: 0 1px 0 rgba(242, 224, 168, 0.14) inset, 0 10px 24px -14px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+.hud > * {
+  pointer-events: auto;
+}
+
+/* ------------------------------------------------------------------ *
+ * Gilt — the shared chip material for anything floating over art.
+ * Dark glass, a gold rim, an inset hairline, and a soft top sheen.
+ * ------------------------------------------------------------------ */
+
+.currency,
+.hud-clock,
+.hud-icon-btn,
+.hud-avatar {
+  position: relative;
+  background: linear-gradient(168deg, rgba(46, 22, 40, 0.82), rgba(9, 4, 8, 0.9));
+  border: 1px solid rgba(227, 193, 90, 0.5);
+  box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(242, 224, 168, 0.22),
+    inset 0 -9px 14px -11px rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(7px);
+}
+
+.currency::after,
+.hud-clock::after,
+.hud-icon-btn::after,
+.hud-avatar::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  border: 1px solid rgba(227, 193, 90, 0.16);
+  pointer-events: none;
 }
 
 .hud-player {
@@ -360,49 +437,39 @@
 }
 
 .hud-avatar {
-  position: relative;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(160deg, var(--wine-600), var(--wine-800));
-  border: 1px solid rgba(227, 193, 90, 0.55);
+  background: linear-gradient(168deg, rgba(125, 31, 56, 0.85), rgba(20, 8, 14, 0.92));
   color: var(--gold-200);
   flex-shrink: 0;
-  box-shadow: 0 3px 8px -2px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(242, 224, 168, 0.3),
-    inset 0 -6px 10px -6px rgba(0, 0, 0, 0.6);
 }
 
-.hud-avatar::after {
-  content: '';
-  position: absolute;
-  inset: 1px;
-  border-radius: 8px;
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.16), transparent 55%);
-  pointer-events: none;
-}
-
+/* A gold lozenge, not a flat dot — the level should read as a minted seal. */
 .hud-level-badge {
   position: absolute;
-  right: -6px;
-  bottom: -6px;
-  min-width: 17px;
-  height: 17px;
-  padding: 0 3px;
+  right: -7px;
+  bottom: -7px;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 4px;
   border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-ui);
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 700;
-  color: #2a1a05;
-  background: var(--gold-bg);
-  border: 1px solid rgba(10, 5, 9, 0.8);
-  box-shadow: 0 2px 5px -1px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.55);
-  z-index: 1;
+  color: #37260a;
+  background: radial-gradient(circle at 34% 26%, #fff8dc, transparent 58%),
+    linear-gradient(168deg, var(--gold-400), var(--gold-600));
+  border: 1.5px solid rgba(12, 5, 10, 0.85);
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 0 10px -3px rgba(227, 193, 90, 0.8);
+  z-index: 2;
 }
 
 .hud-player-id {
@@ -410,40 +477,46 @@
   max-width: 190px;
 }
 
+/* Name, role and rank bar sit on the art with no plate under them, so the
+ * legibility has to come from the type itself. */
 .hud-name {
   font-family: var(--font-display);
-  font-size: 13px;
+  font-size: 14px;
+  letter-spacing: 0.02em;
   color: var(--gold-200);
-  line-height: 1.1;
+  line-height: 1.15;
   white-space: nowrap;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.95), 0 2px 8px rgba(0, 0, 0, 0.8);
 }
 
 .hud-estate {
   font-family: var(--font-ui);
   font-size: 9px;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--parchment);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.95), 0 2px 6px rgba(0, 0, 0, 0.8);
 }
 
 .hud-progress {
   margin-top: 4px;
   height: 4px;
-  box-shadow: 0 1px 0 rgba(242, 224, 168, 0.1) inset, 0 1px 2px rgba(0, 0, 0, 0.6) inset;
+  background: rgba(6, 3, 6, 0.85);
+  border-color: rgba(227, 193, 90, 0.4);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(0, 0, 0, 0.7);
 }
 
 .hud-progress > i {
-  box-shadow: 0 0 6px -1px rgba(227, 193, 90, 0.7);
+  box-shadow: 0 0 7px -1px rgba(227, 193, 90, 0.85);
 }
 
 .hud-currencies {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   margin: 0 auto;
   overflow-x: auto;
   scrollbar-width: none;
@@ -459,73 +532,38 @@
   gap: 5px;
   font-size: 12px;
   flex-shrink: 0;
-  padding: 3px 10px 3px 3px;
+  padding: 3px 11px 3px 4px;
   border-radius: 999px;
-  background: linear-gradient(160deg, rgba(58, 28, 51, 0.75), rgba(10, 5, 9, 0.85));
-  border: 1px solid rgba(201, 162, 39, 0.28);
-  box-shadow: 0 3px 8px -4px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(242, 224, 168, 0.08);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
 }
 
 .currency-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 999px;
   flex-shrink: 0;
-  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.35), transparent 60%),
-    linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.3));
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  width: 21px;
+  height: 21px;
 }
 
 .currency-gold {
-  color: var(--gold-400);
-}
-
-.currency-gold .currency-icon {
-  color: var(--gold-400);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(227, 193, 90, 0.4),
-    0 0 8px -2px rgba(227, 193, 90, 0.55);
+  color: var(--gold-200);
 }
 
 .currency-parchment {
   color: var(--parchment);
 }
 
-.currency-parchment .currency-icon {
-  color: var(--parchment);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(217, 203, 176, 0.35);
-}
-
 .currency-crystal {
-  color: #7fd4e8;
-}
-
-.currency-crystal .currency-icon {
-  color: #7fd4e8;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(127, 212, 232, 0.4),
-    0 0 8px -2px rgba(127, 212, 232, 0.5);
+  color: #b6ecfa;
 }
 
 .currency-rose {
   color: var(--rose-300);
 }
 
-.currency-rose .currency-icon {
-  color: var(--rose-300);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(244, 166, 191, 0.4),
-    0 0 8px -2px rgba(224, 87, 128, 0.5);
-}
-
 .currency-energy {
-  color: #7bdb98;
-}
-
-.currency-energy .currency-icon {
-  color: #7bdb98;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(79, 157, 105, 0.45),
-    0 0 8px -2px rgba(79, 157, 105, 0.55);
+  color: #9fe8b5;
 }
 
 .hud-right {
@@ -538,23 +576,10 @@
 .hud-clock {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 4px 12px 4px 4px;
+  gap: 8px;
+  padding: 4px 13px 4px 5px;
   border-radius: 999px;
-  background: linear-gradient(160deg, rgba(58, 28, 51, 0.75), rgba(10, 5, 9, 0.85));
-  border: 1px solid rgba(201, 162, 39, 0.28);
-  box-shadow: 0 3px 8px -4px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(242, 224, 168, 0.08);
   color: var(--gold-400);
-}
-
-.hud-clock svg {
-  width: 22px;
-  height: 22px;
-  padding: 4px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.3), transparent 60%),
-    linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.3));
-  box-shadow: inset 0 0 0 1px rgba(227, 193, 90, 0.35), 0 0 8px -2px rgba(227, 193, 90, 0.5);
 }
 
 .hud-day {
@@ -563,28 +588,28 @@
   color: var(--gold-200);
   line-height: 1.1;
   white-space: nowrap;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
 }
 
 .hud-icon-btn {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(160deg, rgba(58, 28, 51, 0.85), rgba(10, 5, 9, 0.9));
-  border: 1px solid rgba(201, 162, 39, 0.35);
   color: var(--parchment);
-  box-shadow: 0 3px 8px -4px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(242, 224, 168, 0.14);
   transition: all var(--dur) var(--ease);
 }
 
 .hud-icon-btn:hover {
-  color: var(--gold-200);
-  border-color: rgba(227, 193, 90, 0.7);
-  box-shadow: 0 3px 10px -4px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(242, 224, 168, 0.2),
-    0 0 10px -3px rgba(227, 193, 90, 0.5);
+  border-color: rgba(242, 224, 168, 0.85);
+  box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(242, 224, 168, 0.3),
+    0 0 14px -3px rgba(227, 193, 90, 0.65);
+}
+
+.hud-icon-btn:hover .gicon {
+  filter: drop-shadow(0 0 5px rgba(227, 193, 90, 0.8));
 }
 
 @media (max-width: 860px) {
@@ -615,13 +640,19 @@
 
   .currency {
     font-size: 11px;
-    padding: 2px 8px 2px 2px;
+    padding: 2px 9px 2px 3px;
     gap: 4px;
   }
 
   .currency-icon {
-    width: 17px;
-    height: 17px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .hud-avatar,
+  .hud-icon-btn {
+    width: 34px;
+    height: 34px;
   }
 
   .hud-clock .label {

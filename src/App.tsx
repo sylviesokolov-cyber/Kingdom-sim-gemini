@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useGameStore } from './state/store';
 import { HeaderHud } from './components/layout/HeaderHud';
 import { Dock } from './components/layout/Dock';
+import { GameIconDefs } from './components/ui/GameIcon';
 import { HomeScreen } from './components/screens/HomeScreen';
 import { ProfileScreen } from './components/screens/ProfileScreen';
 import { KingdomScreen } from './components/screens/KingdomScreen';
@@ -45,6 +46,7 @@ export default function App() {
 
   return (
     <div className="app-shell">
+      <GameIconDefs />
       <div className="app-stage">
         <div className="rotate-notice">
           <h2>Turn your device</h2>

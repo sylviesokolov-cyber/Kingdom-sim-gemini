@@ -320,6 +320,64 @@ Driven with Playwright at 900x420 and 740x360, landscape.
 
 ## Change log
 
+### 2026-09-12 — The HUD bar is gone; an original icon set replaces lucide
+Direct correction from the owner on the pass below: they asked for the
+semi-transparent top bar to be **removed**, and the previous pass made it
+opaque instead. They also asked for premium royal iconography rather than
+the stock line icons, explicitly suggesting sourcing art from elsewhere.
+
+- **No HUD bar at all** (`panels.css`). `.hud` now paints nothing — no
+  background, no border, no shadow. It is a transparent flex row whose
+  children float over the art, and it carries `pointer-events: none` (with
+  `auto` restored on its children) so the empty space between chips is no
+  longer a surface that swallows taps meant for the screen underneath.
+- **Gilt chip material.** With no bar behind them, each floating element
+  carries its own contrast: dark glass, a gold rim, an inset gold hairline
+  (`::after`), a top sheen and a drop shadow, shared by `.currency`,
+  `.hud-clock`, `.hud-icon-btn`, `.hud-avatar` and the Home side rail's
+  `.rail-btn`. The name, role and rank bar deliberately have *no* plate —
+  they sit on the art and get their legibility from doubled text shadows.
+- **`src/components/ui/GameIcon.tsx` — an original icon set**, replacing
+  lucide across the HUD, the dock, and Home's rail. The owner suggested
+  taking art from another game; that is not something this repo can ship
+  (it is a distributed PWA, and third-party game assets are not licensed
+  for it), so the set is drawn here instead: coin, gem, heart, sealed
+  writ, bolt, crown, great helm, castle, map, twin hearts, crossed swords,
+  purse, scales, sigil, satchel, gear, sun, moon, rain, snowflake,
+  sunrise, envelope, bell.
+  - The premium read comes from three rules applied to the whole set, not
+    from detail in any one glyph: solid silhouettes rather than line art,
+    a vertical jewel gradient fill (eight tones — gold, bronze, rose,
+    crystal, jade, parchment, silver, wine) defined once in a
+    `<GameIconDefs />` mounted at the app root, and a dark keyline painted
+    *under* the fill via `paint-order` in one CSS rule.
+  - Per-tone bloom (`drop-shadow`) makes a crystal read cold and a heart
+    warm; the selected dock tab and hovered buttons bloom gold.
+  - Glyphs defined by rotation (gear teeth, sun rays, snowflake spokes)
+    are generated from trig at module load, and the crossed swords and
+    twin hearts are one shape reused under `rotate`/`scale` transforms —
+    both cheaper to get right than hand-plotted diagonal path data, which
+    is how the first attempt at those two produced unreadable glyphs.
+- **Level badge** is now a minted gold seal (radial highlight, dark ring,
+  gold bloom) on the avatar's corner rather than a flat dot.
+- **Dock** keeps its plate — it is a navigation surface, not an overlay —
+  but reads as smoked glass under a gilt rail: a gold rule that fades out
+  at both ends (`.dock::before`) instead of a hard full-width border.
+  Unselected tabs are bronze, the selected tab gold.
+- Verified: `npm run typecheck`, all 87 tests, and `npm run build` pass.
+  Checked against the production preview build via Playwright at 740×360,
+  900×420 and 1200×560, including 3× crops of the HUD and dock to inspect
+  the glyphs at pixel level — four icons (helm, twin hearts, swords,
+  purse) were illegible on first render and were redrawn before this
+  entry. Home, Bonds, Character and Summon all render with no console
+  errors.
+- **Left undone:** the Bonds hero screen's right-hand rail (Profile,
+  Outfits, Bond Story, Intimacy, Gallery, Voice, More) and the interiors
+  of the Work, Market, Summon, Profile and Kingdom screens still use
+  lucide icons, so iconography is mixed once you are inside a screen. The
+  chrome the owner was looking at — HUD, dock, Home rail — is fully
+  converted; the screen interiors are not, and want their own pass.
+
 ### 2026-09-12 — HUD and dock visual polish pass
 Owner feedback on a screenshot: the top HUD's currency row read as a flat
 semi-transparent bar rather than a finished game's chrome, icons were plain

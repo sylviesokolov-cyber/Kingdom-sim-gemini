@@ -1,17 +1,13 @@
 import { useMemo, useState } from 'react';
+import { ChevronRight, Eye, EyeOff, TrendingDown, Users } from 'lucide-react';
 import {
-  Bell,
-  ChevronRight,
-  Crown,
-  Eye,
-  EyeOff,
-  Heart,
-  Mail,
-  ScrollText,
-  Sparkles,
-  TrendingDown,
-  Users,
-} from 'lucide-react';
+  IconBell,
+  IconCrown,
+  IconHeart,
+  IconMail,
+  IconScroll,
+  IconSparkle,
+} from '../ui/GameIcon';
 import { useGameStore } from '../../state/store';
 import type { LiveEventDefinition } from '../../types';
 import { canPromoteEstate, getEstateTier } from '../../engine/progression';
@@ -84,14 +80,14 @@ export function HomeScreen({ hideUI, onToggleHideUI }: Props) {
   const panelItems: { icon: React.ReactNode; text: string; onClick: () => void }[] = [];
   if (live.length > 0) {
     panelItems.push({
-      icon: <Sparkles size={13} />,
+      icon: <IconSparkle size={14} tone="gold" />,
       text: `${live.length} event${live.length === 1 ? '' : 's'} running`,
       onClick: () => setShowEvents(true),
     });
   }
   if (unvisited > 0) {
     panelItems.push({
-      icon: <Heart size={13} />,
+      icon: <IconHeart size={14} tone="rose" />,
       text: `${unvisited} companion${unvisited === 1 ? '' : 's'} await you`,
       onClick: () => setScreen('characters'),
     });
@@ -112,7 +108,7 @@ export function HomeScreen({ hideUI, onToggleHideUI }: Props) {
   }
   if (unrestHigh) {
     panelItems.push({
-      icon: <Bell size={13} />,
+      icon: <IconBell size={14} tone="gold" />,
       text: 'Unrest is rising in the kingdom',
       onClick: () => setScreen('kingdom'),
     });
@@ -135,19 +131,19 @@ export function HomeScreen({ hideUI, onToggleHideUI }: Props) {
       {!hideUI && (
         <>
           <aside className="side-rail">
-            <RailButton icon={<Mail size={17} />} label="Mail" onClick={() => pushToast('No new mail.')} />
+            <RailButton icon={<IconMail size={19} tone="parchment" />} label="Mail" onClick={() => pushToast('No new mail.')} />
             <RailButton
-              icon={<ScrollText size={17} />}
+              icon={<IconScroll size={19} tone="parchment" />}
               label="Quests"
               onClick={() => pushToast('The quest log opens in a later chapter.')}
             />
             <RailButton
-              icon={<Sparkles size={17} />}
+              icon={<IconSparkle size={19} tone="gold" />}
               label="Events"
               dot={live.length > 0}
               onClick={() => setShowEvents(true)}
             />
-            <RailButton icon={<Bell size={17} />} label="Notice" onClick={() => pushToast('Nothing posted.')} />
+            <RailButton icon={<IconBell size={19} tone="parchment" />} label="Notice" onClick={() => pushToast('Nothing posted.')} />
           </aside>
 
           <button
@@ -155,7 +151,7 @@ export function HomeScreen({ hideUI, onToggleHideUI }: Props) {
             onClick={() => setScreen(nextTier ? 'work' : 'kingdom')}
             title={nextTier ? `Petition for ${nextTier.title} on the Work screen` : 'Open the Kingdom screen'}
           >
-            <Crown size={16} />
+            <IconCrown size={19} tone="gold" />
             <div className="home-quest-body">
               <span className="home-quest-eyebrow">
                 Day {day} · {tier.title}
