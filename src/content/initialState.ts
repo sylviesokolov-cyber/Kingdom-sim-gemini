@@ -15,7 +15,7 @@ import { NPC_DEFINITIONS } from './npcs';
 import { RESOURCE_LIST } from './resources';
 import { createInitialDistricts, createInitialFacilities, TOTAL_START_POPULATION } from './world';
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 3;
 
 /** Faction opinion and power at game start. The player is nobody to all of them. */
 const INITIAL_FACTION_SETUP: Record<FactionId, { opinion: number; power: number; stability: number }> = {

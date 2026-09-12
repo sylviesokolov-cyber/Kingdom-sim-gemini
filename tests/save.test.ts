@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createNewGame } from '../src/content/initialState';
+import { createNewGame, SAVE_VERSION } from '../src/content/initialState';
 import { migrateSave, serializeSave } from '../src/state/save';
 import { simulateDay } from '../src/engine/simulation';
 import { NPC_DEFINITIONS } from '../src/content/npcs';
@@ -92,6 +92,23 @@ describe('migration of imperfect saves', () => {
 
   it('always stamps the current save version', () => {
     const restored = migrateSave({ version: 0, seed: 1 })!;
-    expect(restored.version).toBe(1);
+    expect(restored.version).toBe(SAVE_VERSION);
+  });
+
+  it('ignores a stray homeSceneIndex left over from a removed feature', () => {
+    // A v2 save briefly carried a Home-backdrop picker that was reverted
+    // before it shipped past this repo's own sessions. A save carrying the
+    // field must still load cleanly with the field simply dropped.
+    const state = createNewGame(11);
+    const raw = JSON.parse(serializeSave(state));
+    raw.version = 2;
+    raw.homeSceneIndex = 2;
+    raw.player.currencies.copper = 4242;
+
+    const restored = migrateSave(raw)!;
+    expect(restored.version).toBe(SAVE_VERSION);
+    expect((restored as unknown as Record<string, unknown>).homeSceneIndex).toBeUndefined();
+    // The rest of the save is untouched — dropping a field is not a reset.
+    expect(restored.player.currencies.copper).toBe(4242);
   });
 });

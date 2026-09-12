@@ -5,7 +5,7 @@
 > Never mark `[x]` without having actually run the check.
 
 **Current phase:** Phase 3 — Simulation core (partial). Phases 0–2 complete.
-**Last updated:** 2026-09-12 (Home reverted to a companion-free kingdom dashboard)
+**Last updated:** 2026-09-12 (Home given a live-event banner; a companion-display attempt was tried and reverted again in the same session — see the change-log entry below)
 
 ---
 
@@ -46,12 +46,13 @@
 ## Phase 2 — Vertical slice — COMPLETE
 
 - [x] Home screen: a companion-free kingdom dashboard — a kingdom-vitals
-      strip (population, welfare, unrest, treasury) and a Day's Actions list
-      driving to every other tab. The owner clarified that the main game is
-      the kingdom simulator and bonding is a side system; Home carries no
-      character art, portraits, or scene-picking as a result (see the
-      2026-09-12 "Home reverted" change-log entry — this superseded the
-      immersive-mode/companion-display version built earlier the same day).
+      strip (population, welfare, unrest, treasury), a live-event banner
+      (`src/content/events/`, day-windowed, text/tag only — no character
+      art), and a Day's Actions list driving to every other tab. The owner
+      clarified that the main game is the kingdom simulator and bonding is a
+      side system; Home carries no character art, portraits, or scene-picking
+      as a result — reconfirmed a third time in the 2026-09-12 change-log
+      entries below after two separate attempts to add companion art back.
 - [x] Bonds tab (Characters screen): a full-bleed hero screen — the
       companion's art fills the stage with Talk/Gift/Bond, the tier/affection
       readout, and traits overlaid directly on it, plus a right-side rail
@@ -88,8 +89,37 @@ still used, just only on the Bonds tab now — it is a CSS approximation, not
 real Live2D rigging, since the roster is single flattened portraits, not
 layered/rigged source art. Documented in `src/styles/screens.css`.
 
+**2026-09-12 — a third companion-display attempt, and a third revert, same
+day.** A session asked to "check the main menu" against Azur Lane / Brown
+Dust 2 read the owner's own `02-home-screen-mockup.png` (which does show a
+full-bleed companion, matching that genre) and rebuilt Home around it again
+— full-bleed companion art on stage, a bond/affection card, a scene picker,
+an immersive mode. All of that was live, tested, and green (typecheck,
+81→90 tests, build) before the owner stopped it mid-task: Home is not that
+screen here, full stop, and CLAUDE.md / UI_DESIGN_SYSTEM.md §3 already say
+so — this is the same correction as `0989586`→`27f2ded` earlier the same
+day, just re-arrived-at by a different session that didn't weight the
+existing settled-design section heavily enough against a reference image.
+Home was rebuilt a third time to the companion-free dashboard. The one
+piece kept from the reverted attempt: a live-event system
+(`src/content/events/`, `LiveEventDefinition`) that gives the Events rail
+button and a new event-ticker row real day-windowed campaign data instead
+of a placeholder toast — rendered as a plain text/tag row, no character
+art, no thumbnail. `homeSceneIndex` (a Home backdrop picker) and the
+`ui.immersive` flag were added and then fully removed in the same
+session — see the save-version bump below.
+
+**Do not re-attempt a companion-display Home.** Two owner corrections
+earlier the same day plus this one make it three. If a future session is
+tempted by a reference image again: read the *settled* section of
+UI_DESIGN_SYSTEM.md (§3) first, which says explicitly Home carries no
+companion art, and treat a genre-comparison ask ("does this look like
+[gacha game]?") as a question to answer about the *existing* screen, not
+a license to rebuild it toward the reference.
+
 ### Verified by playthrough
-A player can, from a fresh save: read the kingdom's vitals and Day's
+A player can, from a fresh save: read the kingdom's vitals, the live event
+banner (a real day-windowed campaign, tappable into its screen), and Day's
 Actions on Home, open the Bonds tab and read a companion's mood-varied
 line, talk to raise affection, gift from the pack (favourites correctly
 surfaced first), work a job, see the goods land in the pack, trade them on
@@ -160,6 +190,7 @@ Recorded so no future session relitigates them:
 | Gacha monetization | In-game currency only; no real-money path | 2026-09-12 |
 | Platform | Landscape-first PWA; portrait unsupported | 2026-09-12 |
 | Protagonist | Male, default name Syl, starts as Outsider | 2026-09-12 |
+| Home screen content | No companion art/portraits/bonding ever, on Home. Tried and reverted three times in one day (`0989586`→`27f2ded`, then again same-session below) | 2026-09-12 |
 
 ---
 
