@@ -11,6 +11,9 @@
  * Rules that must hold at every supported width:
  *   - the companion's face is never covered by a panel
  *   - Next Day is always reachable by the right thumb
+ *
+ * `.scene-bg` / `.scene-vignette` are shared with the Bonds tab's full-bleed
+ * hero screen, not Home-exclusive despite living in this file.
  */
 
 .home {
@@ -19,26 +22,26 @@
   overflow: hidden;
 }
 
-.home-bg {
+.scene-bg {
   position: absolute;
   inset: 0;
   background-size: cover;
   background-position: center 30%;
-  /* These chambers plates carry their own figure in the composition. Blurring
-     and darkening turns her into atmosphere behind the companion on stage,
-     rather than a second, unrelated character competing for the eye. */
+  /* Lighter than the first pass: the owner asked to actually see the
+     backdrop (Azur Lane / Brown Dust 2 register), so this now reads as a
+     real place behind the companion rather than pure atmosphere. */
   transform: scale(1.1);
-  filter: saturate(0.9) brightness(0.58) blur(5px);
+  filter: saturate(1) brightness(0.8) blur(2px);
   transition: opacity 320ms var(--ease);
 }
 
-.home-vignette {
+.scene-vignette {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 55% at 50% 42%, transparent 40%, rgba(10, 5, 9, 0.5) 100%),
-    linear-gradient(180deg, rgba(10, 5, 9, 0.8) 0%, transparent 20%, transparent 55%, rgba(10, 5, 9, 0.92) 100%),
-    linear-gradient(90deg, rgba(10, 5, 9, 0.62) 0%, transparent 24%, transparent 76%, rgba(10, 5, 9, 0.68) 100%);
+    radial-gradient(ellipse 60% 55% at 50% 42%, transparent 50%, rgba(10, 5, 9, 0.32) 100%),
+    linear-gradient(180deg, rgba(10, 5, 9, 0.55) 0%, transparent 22%, transparent 58%, rgba(10, 5, 9, 0.75) 100%),
+    linear-gradient(90deg, rgba(10, 5, 9, 0.4) 0%, transparent 26%, transparent 74%, rgba(10, 5, 9, 0.45) 100%);
 }
 
 /* ------------------------------------------------------------------ *
@@ -172,6 +175,19 @@
   color: rgba(242, 224, 168, 0.72);
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
   white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ *
+ * Immersive ("hide UI") toggle — Azur Lane / Brown Dust 2 style: strip
+ * every panel and see only the backdrop and companion. Always visible
+ * itself, in both states, so the player is never stuck without chrome.
+ * ------------------------------------------------------------------ */
+
+.immersive-toggle {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 50;
 }
 
 /* ------------------------------------------------------------------ *

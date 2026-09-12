@@ -1,4 +1,4 @@
-import { Coins, Gem, Heart, Scroll, Settings, Sun, Moon, CloudRain, Snowflake } from 'lucide-react';
+import { Coins, Eye, Gem, Heart, Scroll, Settings, Sun, Moon, CloudRain, Snowflake } from 'lucide-react';
 import type { GameState } from '../../types';
 import { getEstateTier } from '../../engine/progression';
 import { ESTATE_LADDER } from '../../content/progression';
@@ -7,6 +7,12 @@ import { estateIndex } from '../../content/progression';
 interface Props {
   game: GameState;
   onOpenSettings: () => void;
+  /**
+   * Present only on Home: lets the player drop into the "hide UI"
+   * immersive view. Omitted everywhere else — no other screen can be left
+   * chromeless (see App.tsx's hideChrome).
+   */
+  onHideUi?: () => void;
 }
 
 const WEATHER_ICON = {
@@ -25,7 +31,7 @@ function short(n: number): string {
   return Math.round(n).toLocaleString();
 }
 
-export function HeaderHud({ game, onOpenSettings }: Props) {
+export function HeaderHud({ game, onOpenSettings, onHideUi }: Props) {
   const { player, clock } = game;
   const next = ESTATE_LADDER[estateIndex(player.estate) + 1];
   const tier = getEstateTier(player.estate);
@@ -70,6 +76,11 @@ export function HeaderHud({ game, onOpenSettings }: Props) {
             </div>
           </div>
         </div>
+        {onHideUi && (
+          <button className="hud-icon-btn" onClick={onHideUi} aria-label="Hide the interface" title="Hide the interface">
+            <Eye size={16} />
+          </button>
+        )}
         <button className="hud-icon-btn" onClick={onOpenSettings} aria-label="Settings">
           <Settings size={16} />
         </button>

@@ -5,7 +5,7 @@
 > Never mark `[x]` without having actually run the check.
 
 **Current phase:** Phase 3 — Simulation core (partial). Phases 0–2 complete.
-**Last updated:** 2026-09-12
+**Last updated:** 2026-09-12 (Home immersive mode + Bonds hero-screen redesign)
 
 ---
 
@@ -47,9 +47,18 @@
 
 - [x] Home screen: a day-action hub with an ambient, idle-animated companion
       display and a Day's Actions list driving to every other tab
-- [x] Bonds tab (Characters screen): the character interactions system — Talk
-      / Gift / Assist with diminishing returns, favourites and jealousy, plus
-      the full relationship-dimension detail sheet
+- [x] Home immersive ("hide UI") mode: an Azur Lane/Brown Dust 2-style toggle
+      that drops every panel (HUD, dock, side rail, actions, stage controls)
+      to show only the backdrop and companion, restorable by tapping
+      anywhere on the stage or the same toggle
+- [x] Bonds tab (Characters screen): a full-bleed hero screen — the
+      companion's art fills the stage with Talk/Gift/Bond, the tier/affection
+      readout, and traits overlaid directly on it, plus a right-side rail
+      (Profile, Outfits, Bond Story, Intimacy, Gallery, Voice, More) and a
+      bottom companion switcher — rather than a roster-grid-first pattern.
+      Profile opens the full relationship-dimension detail sheet (trust,
+      respect, desire, resentment, jealousy, perks, opinions, memories).
+      Talk / Gift / Bond retain diminishing returns, favourites and jealousy.
 - [x] Work screen with career tracks and readable prerequisite failures
 - [x] Market screen trading against simulated prices, with perk-adjusted spreads
 - [x] Characters roster with rarity frames and a full character detail sheet
@@ -115,7 +124,9 @@ it against the real population was the only way to know it worked.
       perks, kingdom investment) land in Phases 4 and 11. Re-tune then, not
       before — tuning it down now would flatten the season.
 - [ ] Council screen is an authored empty state, not a system.
-- [ ] Bond episodes, outfits, gallery and voice are stubs that say so.
+- [ ] Bond episodes, outfits, intimacy scenes, intimacy gallery and voice are
+      all stubs that say so on the Bonds tab's rail (disabled, with a title
+      explaining what unlocks them).
 - [ ] Character art is shared between some characters; the roster needs
       bespoke plates. The stage crop assumes the square-canvas source art.
 
@@ -205,6 +216,61 @@ Driven with Playwright at 900x420 and 740x360, landscape.
 ---
 
 ## Change log
+
+### 2026-09-12 — Home immersive mode + Bonds hero-screen redesign
+Follow-up correction to the same-day Home/Bonds split, after the owner
+clarified the intended reference more precisely (a full character-card UI
+with the interaction rail on art, and an Azur Lane/Brown Dust 2-style
+hide-UI toggle on Home).
+
+- **Home immersive mode.** Added `ui.immersive` (session-local, not
+  persisted — Home always opens with chrome visible) to the store. An Eye
+  button in the HUD (Home only) hides the HUD, dock, side rail, location
+  label, stage controls and Day's Actions, leaving only the backdrop and
+  companion; an EyeOff button appears in their place, and tapping anywhere
+  on the stage also restores the chrome. Leaving Home always clears it, so
+  no other screen can be left chromeless.
+- **Lightened the Home backdrop.** The chambers plate's filter moved from
+  `saturate(.9) brightness(.58) blur(5px)` to `saturate(1) brightness(.8)
+  blur(2px)`, and the vignette gradients were lightened to match — the
+  owner asked to actually see the background, not have it read as pure
+  atmosphere behind the companion.
+- **Rebuilt the Bonds tab as a full-bleed hero screen.** Replaced the
+  roster-grid-first + detail-modal pattern with the companion's art filling
+  the stage and the interaction UI overlaid directly on it: name, title,
+  mood, a tier/affection readout (heart + tier number + bar + `n/cap`), and
+  traits top-left; the mood-varied quote and Talk/Gift/**Bond** (renamed
+  from Assist) bottom-left; a vertical rail on the right for Profile,
+  Outfits, Bond Story, **Intimacy**, **Intimacy Gallery**, Voice, and More
+  (all but Profile are disabled stubs naming what unlocks them — Intimacy
+  and its gallery will stay non-explicit per the content guide when they
+  land); and the companion switcher plus a button opening the full roster
+  grid at bottom-center. Profile opens a trimmed version of the former
+  detail modal (condition, what she runs/wants/fears, the five relationship
+  dimensions, perks, opinions, memories) without duplicating what's already
+  on the main screen.
+- **Renamed the shared scene classes.** `.home-bg`/`.home-vignette` became
+  `.scene-bg`/`.scene-vignette` in `home.css`, since both Home and the Bonds
+  hero screen now use them.
+- **Fixed a layout collision found while screenshotting at 740×360**: the
+  Bonds hero's quote/action block and its bottom-center companion switcher
+  pill overlapped once the switcher held enough companions. Capped the
+  switcher pill's width (scrollable past that) and the quote/action block's
+  width so they can no longer reach each other at any supported width or
+  retinue size, rather than tuning breakpoints to one save's companion
+  count.
+- **Fixed a rail-overflow bug** at short landscape heights (≤430px): the
+  Bonds hero's seven-entry action rail, vertically centered, was taller
+  than the space between the HUD and dock and pushed its top entry up
+  behind the HUD, which then intercepted its clicks. The same media query
+  that already shrinks other Home/Bonds chrome now also drops the rail to
+  icon-only there, which fits with room to spare; each button keeps an
+  `aria-label` so the icon-only state stays accessible.
+- Verified at 900×420 and 740×360 landscape via Playwright: immersive
+  mode's enter/restore round-trip, the Bonds hero screen, its Profile and
+  roster modals, and the fixed layouts all screenshot clean with no
+  overlapping chrome; typecheck, all 81 tests, and the production build
+  pass (`npm run verify`).
 
 ### 2026-09-12 — Home/Bonds redesign
 - Split companion interaction out of Home into a dedicated Bonds tab

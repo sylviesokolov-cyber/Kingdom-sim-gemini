@@ -770,33 +770,6 @@
   gap: 5px;
 }
 
-.bond-links {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-}
-
-.link-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 7px;
-  border-radius: 7px;
-  font-family: var(--font-ui);
-  font-size: 9px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--parchment);
-  background: rgba(10, 5, 9, 0.42);
-  border: 1px solid rgba(201, 162, 39, 0.18);
-  transition: all var(--dur) var(--ease);
-}
-
-.link-btn:hover {
-  border-color: rgba(201, 162, 39, 0.5);
-  color: var(--gold-200);
-}
-
 /* ------------------------------------------------------------------ *
  * Day's Actions rows — Home's action list reuses .row/.row-list and adds
  * a leading icon slot plus a tone modifier on the subtitle.
@@ -825,12 +798,180 @@
   opacity: 0.6;
 }
 
-.link-btn:disabled {
-  opacity: 0.45;
+/* ------------------------------------------------------------------ *
+ * The Bonds tab hero screen — full-bleed companion art with the
+ * interaction UI overlaid directly on it, matching the reference
+ * character-card layout rather than a roster-grid-first pattern.
+ * ------------------------------------------------------------------ */
+
+.bond-hero {
+  overflow: hidden;
+}
+
+.bond-stage {
+  top: 0;
+}
+
+.bond-head {
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  z-index: 20;
+  max-width: 62%;
+}
+
+.bond-head h1 {
+  font-size: 20px;
+  color: var(--gold-200);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+  margin: 0;
+}
+
+.bond-subtitle {
+  margin: 2px 0 6px;
+  font-size: 12px;
+  color: var(--parchment);
+  font-style: italic;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+
+.bond-tier-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--rose-500);
+  margin-bottom: 6px;
+}
+
+.bond-tier-num {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  min-width: 12px;
+}
+
+.bond-tier-row .bar {
+  flex: 1;
+  max-width: 120px;
+}
+
+.bond-tier-cap {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  color: var(--parchment);
+  font-variant-numeric: tabular-nums;
+}
+
+.bond-foot {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  z-index: 20;
+  /* Capped well clear of the centered companion-switcher pill below — see
+     .bond-hero .retinue-strip, which is itself capped for the same reason. */
+  width: min(230px, 42%);
+}
+
+.bond-foot .bond-quote {
+  margin-bottom: 7px;
+}
+
+.bond-rail {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.bond-rail-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 52px;
+  padding: 7px 3px;
+  border-radius: 11px;
+  background: rgba(18, 8, 16, 0.62);
+  border: 1px solid rgba(201, 162, 39, 0.24);
+  color: var(--parchment);
+  transition: all var(--dur) var(--ease);
+}
+
+.bond-rail-btn:hover:not(:disabled) {
+  border-color: rgba(201, 162, 39, 0.6);
+  color: var(--gold-200);
+}
+
+.bond-rail-btn:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
-.link-btn:disabled:hover {
-  border-color: rgba(201, 162, 39, 0.18);
-  color: var(--parchment);
+.bond-rail-btn span {
+  font-family: var(--font-ui);
+  font-size: 7px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.bond-hero .stage-controls {
+  bottom: 14px;
+}
+
+/* However large the retinue grows, the switcher pill stays a fixed width —
+   otherwise it would eventually collide with the quote/action block, which
+   is capped from the other side for the same reason. */
+.bond-hero .retinue-strip {
+  max-width: 150px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.bond-hero .retinue-strip::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-height: 430px) {
+  .bond-head {
+    top: 8px;
+  }
+
+  .bond-head h1 {
+    font-size: 16px;
+  }
+
+  /* Seven rail entries no longer fit with labels once the stage drops
+     below ~310px tall (screen height minus the header and dock) — icon-only
+     keeps every entry clear of the header/dock chrome above and below. */
+  .bond-rail {
+    gap: 5px;
+  }
+
+  .bond-rail-btn {
+    width: 34px;
+    padding: 4px 3px;
+  }
+
+  .bond-rail-btn span {
+    display: none;
+  }
+
+  .bond-foot {
+    bottom: 10px;
+  }
+
+  .bond-hero .stage-controls {
+    bottom: 10px;
+  }
+}
+
+@media (max-width: 860px) {
+  .bond-head {
+    max-width: 56%;
+  }
 }

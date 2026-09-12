@@ -84,7 +84,7 @@ border-radius: 14px;
 **Home holds no companion interaction.** `02-home-screen-mockup.png` set the original visual
 target — illustration-first, dark-royal-gold, character-anchored — but as of the 2026-09-12
 redesign Home is the player's own chambers: a day-action hub with a purely decorative,
-idle-animated companion display. Talk, Gift, and Assist live in the Bonds tab
+idle-animated companion display. Talk, Gift, and Bond live in the Bonds tab
 (`CharactersScreen`) instead — see `docs/systems/BONDS.md`.
 
 Zones, clockwise from top-left:
@@ -93,7 +93,7 @@ Zones, clockwise from top-left:
 |---|---|
 | **Player chip** (top-left) | Avatar, name, `Lv. 12 Outsider`, next-estate progress bar |
 | **Currency bar** (top-center) | Copper, Guild Marks, Fate Crystals, Bond Hearts |
-| **Realm chip** (top-right) | `Day 1`, weather, settings |
+| **Realm chip** (top-right) | `Day 1`, weather, **hide-UI toggle**, settings |
 | **Side rail** (left edge) | Mail · Quests · Events · Notice — each with an unread dot |
 | **Location label** (top-center, over the stage) | `Valenreach · {scene name} · Day {n}` |
 | **Character stage** (center) | The chosen companion, idle-animated, over the chambers backdrop |
@@ -109,18 +109,41 @@ plus a slow parallax drift toward the pointer on desktop only (gated to `pointer
 so touch dragging never triggers it, and to a `prefers-reduced-motion` check before it ever writes
 a CSS variable). See `.l2d-anchor` / `.stage-art` in `src/styles/home.css`.
 
+**Immersive ("hide UI") mode.** Azur Lane/Brown Dust 2-style: an Eye button in the HUD (visible
+only on Home) drops every panel — HUD, dock, side rail, location label, stage controls, Day's
+Actions — leaving only the backdrop and companion. An EyeOff button appears in the same corner to
+restore, and tapping anywhere on the stage does the same. Session-local (`ui.immersive`, not
+persisted) and Home-only: leaving Home always clears it, so no other screen can be left
+chromeless. See `setImmersive` / `hideChrome` in `src/state/store.ts` and `src/App.tsx`.
+
 **Rules:** the companion's face is never covered by a panel. `Next Day` is always reachable by the
 right thumb. The stage controls never gate a mechanic — cycling the scene or the displayed
 companion is cosmetic, never an affection/trust change.
 
 ### The Bonds tab
 
-Companion interaction's actual home. The roster grid opens a character detail modal containing,
-in order: portrait, traits + derived mood, the five relationship-dimension bars, a mood-varied
-quote, **Talk / Gift / Assist**, the Outfits/Bond Story/Gallery/Voice quick-links (disabled stubs
-until those systems land), condition, what she runs, what she wants/fears, her bond perks with
-live suspended/active state, her opinions of the rest of the cast, and her memory of the player.
-The gift picker reuses the same favourites-first sort as the old Home implementation did.
+Companion interaction's actual home — a full-bleed hero screen, not a roster-grid-first pattern.
+The companion's art fills the stage (reusing Home's `.scene-bg`/`.scene-vignette`/`.stage`
+treatment) with the interaction UI overlaid directly on it:
+
+| Zone | Contents |
+|---|---|
+| **`.bond-head`** (top-left, over the art) | Name, title, mood, the tier/affection readout (heart · tier number 1–6 · bar · `affection/cap`), and up to three traits |
+| **`.bond-foot`** (bottom-left, over the art) | The mood-varied quote, then **Talk / Gift / Bond** |
+| **`.bond-rail`** (right edge) | Profile · Outfits · Bond Story · **Intimacy** · **Intimacy Gallery** · Voice · More — all but Profile are disabled stubs naming what unlocks them |
+| **Stage controls** (bottom-center) | A button opening the full roster grid + the companion-switcher strip (width-capped so it can never grow into `.bond-foot`) |
+
+**Profile** opens a trimmed version of the old detail modal — condition, what she runs, what she
+wants/fears, the five relationship-dimension bars, her bond perks with live suspended/active
+state, her opinions of the rest of the cast, and her memory of the player — without repeating the
+header/traits/tier/quote/actions already on the main screen. The roster grid (rarity frames,
+affection bars) and the gift picker (favourites-first sort) are unchanged from the previous
+implementation, just reachable from the stage controls and the Gift button respectively instead
+of always-open.
+
+**Intimacy and its gallery are content-guide-bound the same as everything else**: whatever lands
+there must stay suggestive/fade-to-black, never explicit, per `docs/CONTENT_GUIDE.md` — the stub
+naming them now does not change that constraint later.
 
 ---
 

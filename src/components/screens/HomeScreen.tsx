@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import {
   Bell,
   ChevronRight,
+  EyeOff,
   Gem,
   HeartHandshake,
   Image as ImageIcon,
@@ -37,6 +38,8 @@ export function HomeScreen() {
   const setHomeScene = useGameStore((s) => s.setHomeScene);
   const setScreen = useGameStore((s) => s.setScreen);
   const pushToast = useGameStore((s) => s.pushToast);
+  const immersive = useGameStore((s) => s.ui.immersive);
+  const setImmersive = useGameStore((s) => s.setImmersive);
 
   const anchorRef = useRef<HTMLDivElement>(null);
 
@@ -62,29 +65,53 @@ export function HomeScreen() {
   };
 
   return (
-    <section className="home" onPointerMove={onPointerMove}>
-      <div className="home-bg" style={{ backgroundImage: `url(${scene.imageUrl})` }} />
-      <div className="home-vignette" />
+    <section
+      className="home"
+      onPointerMove={onPointerMove}
+      onClick={() => {
+        if (immersive) setImmersive(false);
+      }}
+    >
+      <div className="scene-bg" style={{ backgroundImage: `url(${scene.imageUrl})` }} />
+      <div className="scene-vignette" />
 
-      <aside className="side-rail">
-        <RailButton icon={<Mail size={17} />} label="Mail" onClick={() => pushToast('No new mail.')} />
-        <RailButton
-          icon={<ScrollText size={17} />}
-          label="Quests"
-          dot
-          onClick={() => pushToast('The quest log opens in a later chapter.')}
-        />
-        <RailButton
-          icon={<Sparkles size={17} />}
-          label="Events"
-          onClick={() => pushToast('No events are running.')}
-        />
-        <RailButton icon={<Bell size={17} />} label="Notice" onClick={() => pushToast('Nothing posted.')} />
-      </aside>
+      {!immersive && (
+        <aside className="side-rail">
+          <RailButton icon={<Mail size={17} />} label="Mail" onClick={() => pushToast('No new mail.')} />
+          <RailButton
+            icon={<ScrollText size={17} />}
+            label="Quests"
+            dot
+            onClick={() => pushToast('The quest log opens in a later chapter.')}
+          />
+          <RailButton
+            icon={<Sparkles size={17} />}
+            label="Events"
+            onClick={() => pushToast('No events are running.')}
+          />
+          <RailButton icon={<Bell size={17} />} label="Notice" onClick={() => pushToast('Nothing posted.')} />
+        </aside>
+      )}
 
-      <div className="location-label">
-        Valenreach · {scene.name} · Day {game.clock.day}
-      </div>
+      {!immersive && (
+        <div className="location-label">
+          Valenreach · {scene.name} · Day {game.clock.day}
+        </div>
+      )}
+
+      {immersive && (
+        <button
+          className="hud-icon-btn immersive-toggle"
+          onClick={(e) => {
+            e.stopPropagation();
+            setImmersive(false);
+          }}
+          aria-label="Show the interface"
+          title="Show the interface"
+        >
+          <EyeOff size={14} />
+        </button>
+      )}
 
       <div className="stage">
         <div className="l2d-anchor" ref={anchorRef}>
@@ -92,56 +119,60 @@ export function HomeScreen() {
         </div>
       </div>
 
-      <div className="stage-controls">
-        <button
-          className="hud-icon-btn"
-          onClick={cycleScene}
-          aria-label="Change the scene"
-          title={`Change the scene (${scene.name})`}
-        >
-          <ImageIcon size={14} />
-        </button>
-        <div className="retinue-strip">
-          {game.retinue.map((id) => {
-            const rd = NPCS_BY_ID[id];
-            const rs = game.npcs[id];
-            if (!rd || !rs) return null;
-            const ill = rs.condition.status !== 'Healthy';
-            return (
-              <button
-                key={id}
-                className={`retinue-avatar ${id === npcId ? 'selected' : ''} ${ill ? 'ill' : ''}`}
-                onClick={() => setActiveCompanion(id)}
-                aria-label={`Bring ${rd.name} to your chambers`}
-                title={ill ? `${rd.name} — ${rs.condition.status}` : rd.name}
-              >
-                <CharacterArt npc={rd} alt="" />
-              </button>
-            );
-          })}
+      {!immersive && (
+        <div className="stage-controls">
+          <button
+            className="hud-icon-btn"
+            onClick={cycleScene}
+            aria-label="Change the scene"
+            title={`Change the scene (${scene.name})`}
+          >
+            <ImageIcon size={14} />
+          </button>
+          <div className="retinue-strip">
+            {game.retinue.map((id) => {
+              const rd = NPCS_BY_ID[id];
+              const rs = game.npcs[id];
+              if (!rd || !rs) return null;
+              const ill = rs.condition.status !== 'Healthy';
+              return (
+                <button
+                  key={id}
+                  className={`retinue-avatar ${id === npcId ? 'selected' : ''} ${ill ? 'ill' : ''}`}
+                  onClick={() => setActiveCompanion(id)}
+                  aria-label={`Bring ${rd.name} to your chambers`}
+                  title={ill ? `${rd.name} — ${rs.condition.status}` : rd.name}
+                >
+                  <CharacterArt npc={rd} alt="" />
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
-      <aside className="home-actions">
-        <div className="home-actions-head">
-          <span className="label">Today, {game.player.name}</span>
-          <h2>What will you do?</h2>
-        </div>
-        <div className="row-list scroll-y" style={{ flex: 1, minHeight: 0 }}>
-          {actions.map((a) => (
-            <button key={a.id} className="row" onClick={() => setScreen(a.screen)}>
-              <span className="row-icon">
-                <a.Icon size={16} />
-              </span>
-              <div className="row-main">
-                <div className="row-title">{a.label}</div>
-                <div className={`row-sub ${a.tone === 'bad' ? 'bad' : ''}`}>{a.sub}</div>
-              </div>
-              <ChevronRight size={14} className="row-chevron" />
-            </button>
-          ))}
-        </div>
-      </aside>
+      {!immersive && (
+        <aside className="home-actions">
+          <div className="home-actions-head">
+            <span className="label">Today, {game.player.name}</span>
+            <h2>What will you do?</h2>
+          </div>
+          <div className="row-list scroll-y" style={{ flex: 1, minHeight: 0 }}>
+            {actions.map((a) => (
+              <button key={a.id} className="row" onClick={() => setScreen(a.screen)}>
+                <span className="row-icon">
+                  <a.Icon size={16} />
+                </span>
+                <div className="row-main">
+                  <div className="row-title">{a.label}</div>
+                  <div className={`row-sub ${a.tone === 'bad' ? 'bad' : ''}`}>{a.sub}</div>
+                </div>
+                <ChevronRight size={14} className="row-chevron" />
+              </button>
+            ))}
+          </div>
+        </aside>
+      )}
     </section>
   );
 }

@@ -19,14 +19,22 @@ import { DigestModal } from './components/ui/DigestModal';
  */
 export default function App() {
   const screen = useGameStore((s) => s.ui.screen);
+  const immersive = useGameStore((s) => s.ui.immersive);
   const toasts = useGameStore((s) => s.ui.toasts);
   const showDigest = useGameStore((s) => s.ui.showDigest);
   const game = useGameStore((s) => s.game);
   const setScreen = useGameStore((s) => s.setScreen);
   const advanceDay = useGameStore((s) => s.advanceDay);
   const resetGame = useGameStore((s) => s.resetGame);
+  const setImmersive = useGameStore((s) => s.setImmersive);
 
   const [showSettings, setShowSettings] = useState(false);
+
+  // Home's "hide UI" mode hides the persistent chrome — HUD and dock — so
+  // only the background and companion remain. Everything else (toasts, the
+  // digest, settings) stays reachable through their own triggers, none of
+  // which exist on screen while this is active.
+  const hideChrome = immersive && screen === 'home';
 
   const alerts = useMemo(
     () => ({
@@ -47,7 +55,13 @@ export default function App() {
           <p>Valenreach is played in landscape. Rotate to enter the kingdom.</p>
         </div>
 
-        <HeaderHud game={game} onOpenSettings={() => setShowSettings(true)} />
+        {!hideChrome && (
+          <HeaderHud
+            game={game}
+            onOpenSettings={() => setShowSettings(true)}
+            onHideUi={screen === 'home' ? () => setImmersive(true) : undefined}
+          />
+        )}
 
         {screen === 'home' && <HomeScreen />}
         {screen === 'kingdom' && <KingdomScreen />}
@@ -71,7 +85,9 @@ export default function App() {
 
         {screen !== 'home' && <div className="dock-spacer" />}
 
-        <Dock screen={screen} onNavigate={setScreen} onAdvanceDay={advanceDay} alerts={alerts} />
+        {!hideChrome && (
+          <Dock screen={screen} onNavigate={setScreen} onAdvanceDay={advanceDay} alerts={alerts} />
+        )}
 
         <div className="toast-stack">
           {toasts.map((t) => (
