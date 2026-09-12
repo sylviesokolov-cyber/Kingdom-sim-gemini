@@ -373,6 +373,7 @@
 
 .hud-player-id {
   min-width: 90px;
+  max-width: 190px;
 }
 
 .hud-name {
@@ -389,6 +390,9 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hud-progress {

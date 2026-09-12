@@ -1,7 +1,7 @@
 import { Coins, Gem, Heart, Scroll, Settings, Sun, Moon, CloudRain, Snowflake } from 'lucide-react';
 import type { GameState } from '../../types';
 import { getEstateTier } from '../../engine/progression';
-import { ESTATE_LADDER } from '../../content/progression';
+import { ESTATE_LADDER, CAREER_DEFINITIONS, rankName } from '../../content/progression';
 import { estateIndex } from '../../content/progression';
 
 interface Props {
@@ -35,6 +35,13 @@ export function HeaderHud({ game, onOpenSettings }: Props) {
 
   const WeatherIcon = WEATHER_ICON[clock.weather] ?? Sun;
 
+  const topCareer = Object.values(player.careers)
+    .filter((c) => c.rank > 0)
+    .sort((a, b) => b.rank - a.rank)[0];
+  const roleLabel = topCareer
+    ? `${tier.title} · ${rankName(topCareer.track, topCareer.rank)} (${CAREER_DEFINITIONS[topCareer.track].name})`
+    : tier.title;
+
   return (
     <header className="hud">
       <div className="hud-player">
@@ -46,7 +53,9 @@ export function HeaderHud({ game, onOpenSettings }: Props) {
             {player.name}
             <span className="label"> Lv.{player.level}</span>
           </div>
-          <div className="hud-estate">{tier.estate}</div>
+          <div className="hud-estate" title={player.estate}>
+            {roleLabel}
+          </div>
           <div className="bar bar-gold hud-progress">
             <i style={{ width: `${progress}%` }} />
           </div>

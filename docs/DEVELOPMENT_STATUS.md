@@ -5,7 +5,7 @@
 > Never mark `[x]` without having actually run the check.
 
 **Current phase:** Phase 3 — Simulation core (partial). Phases 0–2 complete.
-**Last updated:** 2026-09-12 (Home rebuilt again — spare, image-first: one backdrop, the rail, a single progression card — see the change-log entry below)
+**Last updated:** 2026-09-12 (Home: HUD now shows the player's current role, a small right-side "Today" panel surfaces live events/companion/market/unrest attention items, and a hide-UI toggle drops all Home chrome to show the backdrop alone — see the change-log entry below)
 
 ---
 
@@ -56,6 +56,23 @@
       (`src/content/events/`, day-windowed, text/tag only) rather than a
       permanent on-screen banner. No companion art or bond content, as
       settled repeatedly earlier the same day — see below.
+- [x] Home screen, follow-up pass: a small translucent "Today" panel on the
+      right edge (`.home-panel`) surfaces only what actually needs
+      attention — live event count, recruited companions not yet interacted
+      with today, recruited companions in a non-Healthy condition, goods at
+      Critically Scarce supply, and kingdom unrest above 60 — each row reads
+      from existing `game`/`ui` state (no new engine logic) and taps through
+      to the relevant screen; it renders nothing when there is nothing to
+      report. The top-left HUD (`HeaderHud.tsx`) now shows the player's
+      current role next to their estate — their highest-ranked career track
+      ("Sergeant (Martial)") when they hold one, else their estate's flavor
+      title. A hide-UI button (top-right of Home, always visible) drops the
+      HUD, dock, rail, quest card and panel to show the backdrop alone —
+      unlike the "immersive mode" removed earlier the same day (which only
+      existed to see companion art that Home no longer has), this one exists
+      to see the *kingdom* backdrop the owner asked to keep as the screen's
+      main focus, and a background selector (single image or carousel) is
+      expected to land here next.
 - [x] Bonds tab (Characters screen): a full-bleed hero screen — the
       companion's art fills the stage with Talk/Gift/Bond, the tier/affection
       readout, and traits overlaid directly on it, plus a right-side rail
@@ -293,6 +310,44 @@ Driven with Playwright at 900x420 and 740x360, landscape.
 ---
 
 ## Change log
+
+### 2026-09-12 — Home: role in the HUD, a "Today" info panel, hide-UI toggle
+Small follow-up polish pass on the current spare, image-first Home (the one
+below this entry describes an *earlier same-day* dashboard redesign that was
+itself superseded — see the note at the top of Phase 2 above; the code, not
+that older entry, is the source of truth).
+
+- **HUD current role** (`HeaderHud.tsx`): the estate line now reads the
+  player's highest-ranked career track's rank name plus track, e.g.
+  "Freeholder · Sergeant (Martial)", falling back to the estate's flavor
+  title alone when the player holds no career rank. Pure display change —
+  reads `player.careers` and `content/progression`'s `rankName`/
+  `CAREER_DEFINITIONS`, no new state.
+- **Home "Today" panel** (`.home-panel` in `home.css`, built in
+  `HomeScreen.tsx`): a small translucent list on the right edge, capped at
+  what's actually true today — live events, recruited companions not yet
+  interacted with (`ui.interactedToday`), recruited companions off
+  `Healthy`, goods at `Critically Scarce` supply, and kingdom unrest above
+  60. Renders nothing when nothing applies. Rows tap through to Events,
+  Bonds, Market, or Kingdom. No new mechanic, no new state — this only
+  reads and formats state the engine already produces.
+- **Hide-UI toggle**: an always-visible Eye/EyeOff button top-right of Home.
+  `hideUI` is local `useState` in `App.tsx` (not persisted, not store
+  state — it has no gameplay meaning), gating the render of `HeaderHud` and
+  `Dock` there and of the rail/quest-card/panel inside `HomeScreen`; leaving
+  Home always shows chrome again on other screens regardless of its value.
+  This looks like the "immersive mode" removed earlier the same day, but
+  the purpose is different: that one existed solely to see companion art
+  that Home no longer has and was correctly cut; this one exists because
+  the owner wants Home's painted backdrop to stay the main focus and asked
+  for a way to see it uncluttered — and said a background selector (single
+  image or carousel) is coming next, which this leaves room for.
+- Verified: `npm run typecheck`, all 87 tests, and `npm run build` pass.
+  Checked at 740×360 and 1024×480 landscape via Playwright against the
+  production preview build — the role reads correctly, the panel renders
+  its rows and doesn't collide with the rail, quest card, or dock at either
+  size, and the hide-UI toggle correctly leaves only the backdrop and
+  itself on screen. Not yet played by a human beyond this scripted check.
 
 ### 2026-09-12 — Home reverted to a companion-free kingdom dashboard
 The owner corrected course on the same day's earlier Home redesigns: the
