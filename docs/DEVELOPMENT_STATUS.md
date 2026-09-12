@@ -153,6 +153,7 @@ Recorded so no future session relitigates them:
 | 2026-09-12 | `077af88` | pass | 81 pass | pass | **green** | Vertical slice — run 34683606087 |
 | 2026-09-12 | `66f4602` | pass | 81 pass | pass | **green** | CI hardening — run 34683745818 |
 | 2026-09-12 | `61686eb` | pass | 81 pass | pass | **green** | Path fix + Pages deploy — CI run 34684177803, deploy run 34684177817 |
+| 2026-09-12 | `0989586` | pass | 81 pass | pass | **green** | Home/Bonds redesign — CI run 34695377499, deploy run 34695377514 |
 
 Run `82e5cfd` failed on a missing `@types/node`, fixed in `f7fc550`. Only the
 branch head gets a run when several commits are pushed together, so `f7fc550`
