@@ -1,28 +1,64 @@
 import { useState } from 'react';
-import { Heart, Shield, Sparkles } from 'lucide-react';
+import { Gift, Heart, MessageCircle, Shield, Shirt, Sparkles, Volume2 } from 'lucide-react';
 import { useGameStore } from '../../state/store';
 import { NPC_DEFINITIONS, NPCS_BY_ID } from '../../content/npcs';
+import { RESOURCES } from '../../content/resources';
 import { perksForNpc } from '../../content/bonds/perks';
-import { activePerks, bondTier, deriveMood, tierIndex } from '../../engine/relationships';
+import { activePerks, bondTier, deriveMood, selectDialogue, tierIndex } from '../../engine/relationships';
 import { ScreenFrame } from '../layout/ScreenFrame';
 import { CharacterArt } from '../ui/CharacterArt';
 
+/**
+ * The Bonds tab — the character interactions system.
+ *
+ * Talk, Gift, and Assist live here rather than on Home: Home is a day-action
+ * hub with a purely decorative companion display, and this is where a bond
+ * actually moves. See docs/systems/BONDS.md.
+ */
 export function CharactersScreen() {
   const game = useGameStore((s) => s.game);
+  const talkTo = useGameStore((s) => s.talkTo);
+  const giftTo = useGameStore((s) => s.giftTo);
+  const assist = useGameStore((s) => s.assist);
   const setActiveCompanion = useGameStore((s) => s.setActiveCompanion);
   const setScreen = useGameStore((s) => s.setScreen);
   const [selected, setSelected] = useState<string | null>(null);
+  const [line, setLine] = useState<string | null>(null);
+  const [showGifts, setShowGifts] = useState(false);
 
   const active = activePerks(game.npcs);
   const roster = NPC_DEFINITIONS.filter((d) => game.npcs[d.id]);
 
   const detailDef = selected ? NPCS_BY_ID[selected] : null;
   const detailState = selected ? game.npcs[selected] : null;
+  const mood = detailState ? deriveMood(detailState) : 'Content';
+
+  const openDetail = (id: string) => {
+    setSelected(id);
+    setLine(null);
+  };
+
+  const onTalk = () => {
+    if (!selected || !detailDef) return;
+    talkTo(selected);
+    setLine(selectDialogue(detailDef, 'personal', mood));
+  };
+
+  // Giftable = anything in the player's inventory, favorites surfaced first.
+  const giftable = detailDef
+    ? Object.entries(game.player.inventory)
+        .filter(([, qty]) => qty > 0)
+        .sort(([a], [b]) => {
+          const aFav = detailDef.favoriteGifts.includes(a) ? 0 : 1;
+          const bFav = detailDef.favoriteGifts.includes(b) ? 0 : 1;
+          return aFav - bFav;
+        })
+    : [];
 
   return (
     <ScreenFrame
       title="The Retinue"
-      subtitle={`${game.retinue.length} of ${roster.length} stand with you.`}
+      subtitle={`${game.retinue.length} of ${roster.length} stand with you. Talk, gift, and grow closer here.`}
       background="characters/backgrounds/queen_background.webp"
     >
       <div className="scroll-y" style={{ height: '100%' }}>
@@ -37,7 +73,7 @@ export function CharactersScreen() {
               <button
                 key={def.id}
                 className={`roster-card rarity-${def.rarity}`}
-                onClick={() => setSelected(def.id)}
+                onClick={() => openDetail(def.id)}
                 style={{ opacity: inRetinue ? 1 : 0.55 }}
               >
                 <CharacterArt npc={def} alt={def.name} />
@@ -96,18 +132,64 @@ export function CharactersScreen() {
                       {t}
                     </span>
                   ))}
-                  <span className="tag">{deriveMood(detailState)}</span>
+                  <span className="tag">{mood}</span>
                 </div>
 
                 {detailDef.bondable && (
-                  <div className="dim-grid">
-                    <Dim label="Affection" value={detailState.relationship.affection} bar="rose" />
-                    <Dim label="Trust" value={detailState.relationship.trust} bar="gold" />
-                    <Dim label="Respect" value={detailState.relationship.respect} bar="gold" />
-                    <Dim label="Desire" value={detailState.relationship.desire} bar="rose" />
-                    <Dim label="Resentment" value={detailState.relationship.resentment} bar="blood" />
-                    <Dim label="Jealousy" value={detailState.relationship.jealousy} bar="blood" />
-                  </div>
+                  <>
+                    <div className="affection-row" style={{ marginBottom: 8 }}>
+                      <span className="affection-heart">
+                        <Heart size={14} fill="currentColor" />
+                        {Math.floor(detailState.relationship.affection)}
+                      </span>
+                      <div className="bar bar-rose">
+                        <i style={{ width: `${detailState.relationship.affection}%` }} />
+                      </div>
+                      <small>{bondTier(detailState.relationship)}</small>
+                    </div>
+
+                    <div className="bond-quote">
+                      “{line ?? selectDialogue(detailDef, 'personal', mood)}”
+                    </div>
+
+                    <div className="bond-actions" style={{ margin: '8px 0' }}>
+                      <button className="btn btn-ghost btn-sm" onClick={onTalk}>
+                        <MessageCircle size={13} />
+                        Talk
+                      </button>
+                      <button className="btn btn-ghost btn-sm" onClick={() => setShowGifts(true)}>
+                        <Gift size={13} />
+                        Gift
+                      </button>
+                      <button className="btn btn-rose btn-sm" onClick={() => assist(detailDef.id)}>
+                        <Heart size={13} />
+                        Assist
+                      </button>
+                    </div>
+
+                    <div className="bond-links" style={{ marginBottom: 8 }}>
+                      <button className="link-btn" disabled title="Outfits arrive with the wardrobe system.">
+                        <Shirt size={12} /> Outfits
+                      </button>
+                      <button className="link-btn" disabled title="Bond stories are being written.">
+                        <Heart size={12} /> Bond Story
+                      </button>
+                      <button className="link-btn" disabled title="The gallery unlocks with her story.">
+                        <Sparkles size={12} /> Gallery
+                      </button>
+                      <button className="link-btn" disabled title="She has no voice yet.">
+                        <Volume2 size={12} /> Voice
+                      </button>
+                    </div>
+
+                    <div className="dim-grid">
+                      <Dim label="Trust" value={detailState.relationship.trust} bar="gold" />
+                      <Dim label="Respect" value={detailState.relationship.respect} bar="gold" />
+                      <Dim label="Desire" value={detailState.relationship.desire} bar="rose" />
+                      <Dim label="Resentment" value={detailState.relationship.resentment} bar="blood" />
+                      <Dim label="Jealousy" value={detailState.relationship.jealousy} bar="blood" />
+                    </div>
+                  </>
                 )}
 
                 <div className="detail-section">
@@ -199,11 +281,56 @@ export function CharactersScreen() {
                       setScreen('home');
                     }}
                   >
-                    Attend her
+                    Bring her to your chambers
                   </button>
                 )}
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showGifts && detailDef && selected && (
+        <div className="modal-backdrop" onClick={() => setShowGifts(false)}>
+          <div className="modal panel-solid" style={{ padding: 16 }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ color: 'var(--gold-200)', marginBottom: 4 }}>Give {detailDef.name} something</h3>
+            <p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 0 }}>
+              She is fond of{' '}
+              {detailDef.favoriteGifts.map((g) => RESOURCES[g]?.name ?? g).join(', ').toLowerCase()}.
+            </p>
+            {giftable.length === 0 ? (
+              <div className="empty">You have nothing to give.</div>
+            ) : (
+              <div className="scroll-y" style={{ maxHeight: '46vh' }}>
+                <div className="row-list">
+                  {giftable.map(([id, qty]) => {
+                    const r = RESOURCES[id];
+                    const fav = detailDef.favoriteGifts.includes(id);
+                    const hated = detailDef.hatedGifts.includes(id);
+                    return (
+                      <button
+                        key={id}
+                        className="row"
+                        onClick={() => {
+                          giftTo(selected, id);
+                          setShowGifts(false);
+                        }}
+                      >
+                        <div className="row-main">
+                          <div className="row-title">{r?.name ?? id}</div>
+                          <div className="row-sub">
+                            {fav ? 'She loves these.' : hated ? 'She despises these.' : 'She will accept it.'}
+                          </div>
+                        </div>
+                        <div className="row-aside">
+                          <span className="cost">×{qty}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

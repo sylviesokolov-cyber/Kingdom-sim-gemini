@@ -47,10 +47,12 @@ export interface GameState {
   market: Record<string, MarketState>;
   gacha: GachaState;
 
-  /** Npc id currently shown on the Home screen. */
+  /** Npc id displayed on the Home screen's chambers scene. */
   activeCompanionId: string;
   /** Npc ids in the player's retinue, in display order. */
   retinue: string[];
+  /** Index into HOME_SCENES — which chambers backdrop Home currently shows. */
+  homeSceneIndex: number;
 
   /** Ids of events already fired, for non-repeatable gating. */
   firedEvents: string[];

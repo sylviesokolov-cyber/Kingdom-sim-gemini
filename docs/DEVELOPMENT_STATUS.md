@@ -45,9 +45,11 @@
 
 ## Phase 2 — Vertical slice — COMPLETE
 
-- [x] Home/Throne screen matching the reference mockup
-- [x] Companion panel with real relationship state (affection, trust, mood, tier)
-- [x] Talk / Gift / Assist with diminishing returns, favourites and jealousy
+- [x] Home screen: a day-action hub with an ambient, idle-animated companion
+      display and a Day's Actions list driving to every other tab
+- [x] Bonds tab (Characters screen): the character interactions system — Talk
+      / Gift / Assist with diminishing returns, favourites and jealousy, plus
+      the full relationship-dimension detail sheet
 - [x] Work screen with career tracks and readable prerequisite failures
 - [x] Market screen trading against simulated prices, with perk-adjusted spreads
 - [x] Characters roster with rarity frames and a full character detail sheet
@@ -57,11 +59,30 @@
 - [x] Inventory with consumables
 - [x] Verified at 900x420 and 740x360 landscape, no console errors
 
+**2026-09-12 redesign — Home and Bonds split.** Home originally hosted the
+companion panel and dialogue directly (matching the first reference
+mockup). The owner asked for a split: Home became a decorative, action-hub
+screen with an ambient "L2D-style" companion display the player can choose
+and a chambers backdrop the player can cycle; all companion interaction
+(Talk/Gift/Assist, the quote line, the relationship-dimension detail) moved
+into the Bonds tab. See `docs/UI_DESIGN_SYSTEM.md` for the current Home
+composition and `docs/systems/BONDS.md` for the interaction model — both
+were already written to describe interaction as a Bonds-tab concern, so no
+system doc needed correcting, only this tracker and the screen itself.
+
+The "L2D-style" idle motion is a CSS approximation (breathing/sway keyframe
++ pointer-parallax on the anchor), not real Live2D rigging — the roster is
+single flattened portraits, not layered/rigged source art. Documented as
+such in `src/styles/home.css`.
+
 ### Verified by playthrough
-A player can, from a fresh save: read a companion's mood-varied line, work a
-job, see the goods land in their pack, trade them on the Bourse, run a
-ten-pull and get Resonance from a duplicate, advance the day, and read a
-digest explaining why prices moved. State survives reload.
+A player can, from a fresh save: pick which companion appears on the Home
+stage and cycle the chambers backdrop, open the Bonds tab and read a
+companion's mood-varied line, talk to raise affection, gift from the pack
+(favourites correctly surfaced first), work a job, see the goods land in
+the pack, trade them on the Bourse, run a ten-pull and get Resonance from a
+duplicate, advance the day, and read a digest explaining why prices moved.
+State survives reload.
 
 ---
 
@@ -183,6 +204,33 @@ Driven with Playwright at 900x420 and 740x360, landscape.
 ---
 
 ## Change log
+
+### 2026-09-12 — Home/Bonds redesign
+- Split companion interaction out of Home into a dedicated Bonds tab
+  (`CharactersScreen`): Talk, Gift, Assist, the mood-varied quote, and the
+  gift picker all now live in the character detail modal there.
+- Rebuilt Home as a day-action hub: a "Day's Actions" list (reusing the
+  shared `.row`/`.row-list` primitives) with live status text replaces the
+  old dialogue box, banner card, and matters card.
+- Added an ambient, idle-animated ("L2D-style") companion display on
+  Home — a CSS breathing/sway keyframe plus pointer-driven parallax on
+  desktop, honestly documented as an approximation since the roster has no
+  rigged/layered source art. Player picks which companion is shown via a
+  small avatar strip (reusing `activeCompanionId`, unchanged in meaning).
+- Added a chambers-backdrop picker: three new owner-supplied background
+  plates (`public/backgrounds/home_*`), a new `HOME_SCENES` content module,
+  and a persisted `homeSceneIndex` field on `GameState` (typed, defaulted,
+  and migrated — round-trip covered by the existing save tests).
+- Moved the relationship-dimension primitives (`.affection-row`,
+  `.affection-heart`, `.trait-row`) and the bond-interaction primitives
+  (renamed `.companion-quote`→`.bond-quote`, `.companion-actions`→
+  `.bond-actions`, `.companion-links`→`.bond-links`) from `home.css` to the
+  shared `screens.css`, since they are no longer Home-exclusive.
+- Renamed the dock's Retinue tab to "Bonds" with a HeartHandshake icon to
+  signal where interaction now lives.
+- Verified at 900x420 and 740x360 landscape: scene cycling, companion
+  picking, and the full Talk/Gift/Assist flow all work with no console
+  errors; typecheck, all 81 tests, and the production build pass.
 
 ### 2026-09-12 — vertical slice
 - Built the playable loop: Home, Kingdom, Retinue, Work, Market, Summon, Pack.

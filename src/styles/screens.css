@@ -706,3 +706,131 @@
 .row-sub .cost {
   display: inline;
 }
+
+/* ------------------------------------------------------------------ *
+ * Shared relationship/bond primitives
+ *
+ * Used by the character roster cards and the Bonds detail modal alike —
+ * kept here rather than in home.css now that Home no longer hosts any
+ * companion interaction.
+ * ------------------------------------------------------------------ */
+
+.affection-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.affection-heart {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--rose-500);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.affection-row .bar {
+  flex: 1;
+}
+
+.affection-row small {
+  font-family: var(--font-ui);
+  font-size: 9px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.trait-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Bond interactions — Talk / Gift / Assist and the profile quick-links.
+ * Lives in the Bonds tab's character detail modal.
+ * ------------------------------------------------------------------ */
+
+.bond-quote {
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.35;
+  color: var(--parchment);
+  padding: 7px 9px;
+  border-left: 2px solid rgba(224, 87, 128, 0.5);
+  background: rgba(10, 5, 9, 0.42);
+  border-radius: 0 7px 7px 0;
+}
+
+.bond-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.bond-links {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+}
+
+.link-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 7px;
+  border-radius: 7px;
+  font-family: var(--font-ui);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--parchment);
+  background: rgba(10, 5, 9, 0.42);
+  border: 1px solid rgba(201, 162, 39, 0.18);
+  transition: all var(--dur) var(--ease);
+}
+
+.link-btn:hover {
+  border-color: rgba(201, 162, 39, 0.5);
+  color: var(--gold-200);
+}
+
+/* ------------------------------------------------------------------ *
+ * Day's Actions rows — Home's action list reuses .row/.row-list and adds
+ * a leading icon slot plus a tone modifier on the subtitle.
+ * ------------------------------------------------------------------ */
+
+.row-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: rgba(10, 5, 9, 0.5);
+  border: 1px solid rgba(201, 162, 39, 0.22);
+  color: var(--gold-400);
+}
+
+.row-sub.bad {
+  color: var(--blood-500);
+}
+
+.row-chevron {
+  color: var(--muted);
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.link-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.link-btn:disabled:hover {
+  border-color: rgba(201, 162, 39, 0.18);
+  color: var(--parchment);
+}

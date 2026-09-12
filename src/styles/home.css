@@ -1,10 +1,15 @@
 /**
- * The Home / Throne screen.
- * Target layout: docs/reference/02-home-screen-mockup.png
+ * The Home screen.
+ *
+ * Home is the player's own chambers — a day-action hub with an ambient,
+ * idle-animated ("L2D-style") companion display the player can pick and
+ * change the backdrop for. It holds no companion interactions: Talk, Gift,
+ * and Assist live in the Bonds tab (CharactersScreen). See
+ * docs/UI_DESIGN_SYSTEM.md and docs/DEVELOPMENT_STATUS.md for the record of
+ * this split.
  *
  * Rules that must hold at every supported width:
  *   - the companion's face is never covered by a panel
- *   - the dialogue box sits in the lower third, clear of her head
  *   - Next Day is always reachable by the right thumb
  */
 
@@ -18,20 +23,22 @@
   position: absolute;
   inset: 0;
   background-size: cover;
-  background-position: center 22%;
-  /* The plates we have are character art, not scenery. Blurring them turns a
-     competing figure into depth behind the companion. */
-  transform: scale(1.12);
-  filter: saturate(0.85) brightness(0.62) blur(6px);
+  background-position: center 30%;
+  /* These chambers plates carry their own figure in the composition. Blurring
+     and darkening turns her into atmosphere behind the companion on stage,
+     rather than a second, unrelated character competing for the eye. */
+  transform: scale(1.1);
+  filter: saturate(0.9) brightness(0.58) blur(5px);
+  transition: opacity 320ms var(--ease);
 }
 
 .home-vignette {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 55% at 45% 42%, transparent 40%, rgba(10, 5, 9, 0.55) 100%),
-    linear-gradient(180deg, rgba(10, 5, 9, 0.82) 0%, transparent 22%, transparent 52%, rgba(10, 5, 9, 0.9) 100%),
-    linear-gradient(90deg, rgba(10, 5, 9, 0.72) 0%, transparent 26%, transparent 56%, rgba(10, 5, 9, 0.86) 100%);
+    radial-gradient(ellipse 60% 55% at 50% 42%, transparent 40%, rgba(10, 5, 9, 0.5) 100%),
+    linear-gradient(180deg, rgba(10, 5, 9, 0.8) 0%, transparent 20%, transparent 55%, rgba(10, 5, 9, 0.92) 100%),
+    linear-gradient(90deg, rgba(10, 5, 9, 0.62) 0%, transparent 24%, transparent 76%, rgba(10, 5, 9, 0.68) 100%);
 }
 
 /* ------------------------------------------------------------------ *
@@ -87,7 +94,16 @@
 }
 
 /* ------------------------------------------------------------------ *
- * Character stage
+ * The L2D-style companion stage
+ *
+ * We do not have rigged, layered Live2D source art — the roster is single
+ * flattened portraits. This approximates the same *feeling* (a character who
+ * reads as present rather than a static poster) with two independent motion
+ * layers instead: an idle breathe-and-sway loop baked into the art itself,
+ * and a slow parallax drift toward the pointer applied to its anchor. Both
+ * respect prefers-reduced-motion — the breathing via the global animation
+ * kill-switch in base.css, the parallax via a JS-side check before it ever
+ * writes a CSS variable.
  * ------------------------------------------------------------------ */
 
 .stage {
@@ -95,13 +111,23 @@
   left: 50%;
   top: 48px;
   bottom: 0;
-  transform: translateX(-46%);
+  transform: translateX(-50%);
   z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
   overflow: hidden;
+}
+
+.l2d-anchor {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate3d(var(--tiltX, 0px), var(--tiltY, 0px), 0);
+  transition: transform 260ms ease-out;
+  will-change: transform;
 }
 
 .stage-art {
@@ -112,22 +138,24 @@
   max-width: none;
   object-fit: contain;
   object-position: center;
-  transform: translateY(-1%);
   filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.8));
-  pointer-events: auto;
-  cursor: pointer;
-  transition: transform 300ms var(--ease);
-  animation: stage-enter 420ms var(--ease);
-}
-
-.stage-art:active {
-  transform: scale(0.995);
+  animation: stage-enter 420ms var(--ease), l2d-idle 5400ms ease-in-out 420ms infinite;
+  transform-origin: 50% 85%;
 }
 
 @keyframes stage-enter {
   from {
     opacity: 0;
-    transform: scale(1.03);
+  }
+}
+
+@keyframes l2d-idle {
+  0%,
+  100% {
+    transform: translateY(-1%) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translateY(-1.8%) rotate(0.35deg) scale(1.007);
   }
 }
 
@@ -147,357 +175,38 @@
 }
 
 /* ------------------------------------------------------------------ *
- * Dialogue box — lower third, clear of her head
+ * Stage controls — change the scene, change who stands in it
  * ------------------------------------------------------------------ */
 
-.home-stack {
+.stage-controls {
   position: absolute;
-  left: 56px;
+  left: 50%;
   bottom: 74px;
+  transform: translateX(-50%);
   z-index: 25;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  width: min(440px, 45%);
-  max-height: calc(100% - 140px);
-}
-
-.home-stack-row {
-  display: flex;
-  align-items: stretch;
-  gap: 8px;
-  width: 100%;
-  min-height: 0;
-}
-
-.dialogue {
-  width: 100%;
-  padding: 11px 15px 13px;
-  background: linear-gradient(150deg, rgba(18, 8, 16, 0.93), rgba(10, 5, 9, 0.88));
-  border: 1px solid rgba(201, 162, 39, 0.32);
-  border-radius: 12px;
-  box-shadow: 0 14px 34px -12px rgba(0, 0, 0, 0.9);
-  cursor: pointer;
-  transition: border-color var(--dur) var(--ease);
-}
-
-.dialogue:hover {
-  border-color: rgba(201, 162, 39, 0.6);
-}
-
-.dialogue-name {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  color: var(--gold-200);
-  margin-bottom: 4px;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 30px;
+  background: rgba(10, 5, 9, 0.55);
+  border: 1px solid rgba(201, 162, 39, 0.26);
+  backdrop-filter: blur(6px);
 }
 
-.dialogue-mood {
+.scene-name {
   font-family: var(--font-ui);
-  font-size: 8px;
+  font-size: 9px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
-}
-
-.dialogue p {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.4;
-  color: var(--ivory);
-  font-style: italic;
+  padding: 0 2px;
+  white-space: nowrap;
 }
 
 /* ------------------------------------------------------------------ *
- * Banner and matters cards
+ * Companion picker strip — reused avatar treatment, no bonding data here
  * ------------------------------------------------------------------ */
-
-.banner-card {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  width: 172px;
-  flex-shrink: 0;
-  padding: 7px;
-  border-radius: 11px;
-  background: linear-gradient(150deg, rgba(74, 18, 38, 0.9), rgba(18, 8, 16, 0.92));
-  border: 1px solid rgba(227, 193, 90, 0.42);
-  box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.9);
-  text-align: left;
-  transition: filter var(--dur) var(--ease);
-}
-
-.banner-card:hover {
-  filter: brightness(1.15);
-}
-
-.banner-card-art {
-  position: relative;
-  width: 40px;
-  height: 46px;
-  flex-shrink: 0;
-  overflow: hidden;
-  border-radius: 7px;
-  border: 1px solid rgba(227, 193, 90, 0.4);
-}
-
-.banner-card-art img {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 250%;
-  height: auto;
-  max-width: none;
-  transform: translate(-50%, -34%);
-}
-
-.banner-card b {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 11px;
-  color: var(--gold-200);
-  line-height: 1.2;
-}
-
-.banner-card small {
-  display: inline-block;
-  margin-top: 3px;
-  font-family: var(--font-ui);
-  font-size: 8px;
-  letter-spacing: 0.06em;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: rgba(224, 87, 128, 0.25);
-  color: var(--rose-300);
-}
-
-.banner-card em {
-  display: block;
-  margin-top: 3px;
-  font-size: 9px;
-  font-style: normal;
-  color: var(--muted);
-}
-
-.matters {
-  flex: 1;
-  min-width: 0;
-  padding: 8px 11px;
-  border-radius: 11px;
-  background: linear-gradient(150deg, rgba(28, 13, 26, 0.92), rgba(10, 5, 9, 0.9));
-  border: 1px solid rgba(201, 162, 39, 0.28);
-  box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.9);
-}
-
-.matters-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-family: var(--font-display);
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  color: var(--gold-200);
-  margin-bottom: 5px;
-}
-
-.matter {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  width: 100%;
-  text-align: left;
-  font-size: 13px;
-  color: var(--parchment);
-  padding: 2px 0;
-  transition: color var(--dur) var(--ease);
-}
-
-.matter:hover {
-  color: var(--gold-200);
-}
-
-.matter-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--gold-500);
-  flex-shrink: 0;
-}
-
-.matter.bad .matter-dot {
-  background: var(--blood-500);
-}
-
-.matter.good .matter-dot {
-  background: var(--jade-500);
-}
-
-/* ------------------------------------------------------------------ *
- * Companion panel — the right column
- * ------------------------------------------------------------------ */
-
-.companion {
-  position: absolute;
-  right: 10px;
-  top: 60px;
-  bottom: 78px;
-  z-index: 30;
-  width: min(310px, 33%);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 10px;
-  overflow-y: auto;
-  scrollbar-width: none;
-  background: var(--panel);
-  border: var(--panel-border);
-  border-radius: var(--panel-radius);
-  box-shadow: var(--panel-shadow);
-  backdrop-filter: blur(12px);
-}
-
-.companion::-webkit-scrollbar {
-  display: none;
-}
-
-.companion-head {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-
-.companion-portrait {
-  position: relative;
-  width: 52px;
-  height: 60px;
-  flex-shrink: 0;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid;
-}
-
-.companion-portrait img {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 250%;
-  height: auto;
-  max-width: none;
-  transform: translate(-50%, -34%);
-}
-
-.companion-id {
-  min-width: 0;
-  flex: 1;
-}
-
-.companion-id h2 {
-  font-size: 19px;
-  color: var(--gold-200);
-  line-height: 1.1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.companion-id p {
-  margin: 1px 0 0;
-  font-size: 13px;
-  color: var(--parchment);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.affection-row {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.affection-heart {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  color: var(--rose-500);
-  font-family: var(--font-ui);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.affection-row .bar {
-  flex: 1;
-}
-
-.affection-row small {
-  font-family: var(--font-ui);
-  font-size: 9px;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.trait-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.companion-quote {
-  font-size: 14px;
-  font-style: italic;
-  line-height: 1.35;
-  color: var(--parchment);
-  padding: 7px 9px;
-  border-left: 2px solid rgba(224, 87, 128, 0.5);
-  background: rgba(10, 5, 9, 0.42);
-  border-radius: 0 7px 7px 0;
-}
-
-.companion-actions {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
-}
-
-.companion-links {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 4px;
-}
-
-.link-btn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 7px;
-  border-radius: 7px;
-  font-family: var(--font-ui);
-  font-size: 9px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--parchment);
-  background: rgba(10, 5, 9, 0.42);
-  border: 1px solid rgba(201, 162, 39, 0.18);
-  transition: all var(--dur) var(--ease);
-}
-
-.link-btn:hover {
-  border-color: rgba(201, 162, 39, 0.5);
-  color: var(--gold-200);
-}
-
-.retinue-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: auto;
-  padding-top: 2px;
-}
 
 .retinue-strip {
   display: flex;
@@ -536,6 +245,34 @@
   position: absolute;
   inset: 0;
   background: rgba(179, 58, 58, 0.32);
+}
+
+/* ------------------------------------------------------------------ *
+ * Day's Actions — the right column, now the primary content of Home
+ * ------------------------------------------------------------------ */
+
+.home-actions {
+  position: absolute;
+  right: 10px;
+  top: 60px;
+  bottom: 78px;
+  z-index: 30;
+  width: min(300px, 34%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--panel);
+  border: var(--panel-border);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--panel-shadow);
+  backdrop-filter: blur(12px);
+}
+
+.home-actions-head h2 {
+  font-size: 17px;
+  color: var(--gold-200);
+  margin-top: 2px;
 }
 
 /* ------------------------------------------------------------------ *
@@ -643,51 +380,36 @@
     top: 50px;
     font-size: 8px;
   }
-}
 
-@media (max-width: 860px) {
-  .companion {
-    width: 248px;
-    top: 54px;
-    bottom: 72px;
+  .home-actions {
+    top: 48px;
+    bottom: 58px;
     padding: 8px;
     gap: 5px;
   }
 
-  .companion-id h2 {
-    font-size: 16px;
+  .stage-controls {
+    bottom: 62px;
+    padding: 4px 8px;
+    gap: 7px;
   }
 
-  .companion-portrait {
-    width: 42px;
-    height: 50px;
+  .retinue-avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 860px) {
+  .home-actions {
+    width: 236px;
+    top: 54px;
+    bottom: 72px;
+    padding: 9px;
   }
 
-  .companion-quote {
-    display: none;
-  }
-
-  .home-stack {
-    left: 50px;
-    bottom: 64px;
-    width: min(400px, 52%);
-    gap: 6px;
-  }
-
-  .dialogue {
-    padding: 7px 11px 9px;
-  }
-
-  .dialogue p {
-    font-size: 13px;
-  }
-
-  .banner-card {
-    width: 136px;
-  }
-
-  .matter {
-    font-size: 11px;
+  .home-actions-head h2 {
+    font-size: 15px;
   }
 
   .dock {
@@ -699,38 +421,7 @@
     height: 46px;
   }
 
-  .stage {
-    transform: translateX(-62%);
-  }
-}
-
-/* Very short landscape: drop the banner rather than stacking three cards. */
-@media (max-height: 430px) {
-  .banner-card {
-    display: none;
-  }
-
-  .companion-quote {
-    display: none;
-  }
-
-  .companion {
-    top: 48px;
-    bottom: 58px;
-    gap: 4px;
-    padding: 8px;
-  }
-
-  .companion-links {
-    display: none;
-  }
-
-  .retinue-avatar {
-    width: 32px;
-    height: 32px;
-  }
-
-  .home-stack {
-    max-height: calc(100% - 120px);
+  .stage-controls {
+    bottom: 66px;
   }
 }

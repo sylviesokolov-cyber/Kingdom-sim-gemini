@@ -2,19 +2,19 @@ import {
   Backpack,
   Castle,
   Gem,
+  HeartHandshake,
   Map,
   Scale,
   ShoppingBag,
   Sunrise,
   Swords,
-  Users,
 } from 'lucide-react';
 import type { ScreenId } from '../../state/store';
 
 const TABS: { id: ScreenId; label: string; Icon: typeof Castle }[] = [
   { id: 'home', label: 'Home', Icon: Castle },
   { id: 'kingdom', label: 'Kingdom', Icon: Map },
-  { id: 'characters', label: 'Retinue', Icon: Users },
+  { id: 'characters', label: 'Bonds', Icon: HeartHandshake },
   { id: 'work', label: 'Work', Icon: Swords },
   { id: 'market', label: 'Market', Icon: ShoppingBag },
   { id: 'council', label: 'Council', Icon: Scale },

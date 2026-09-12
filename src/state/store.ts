@@ -58,6 +58,7 @@ export interface GameStore {
   /* --- navigation --- */
   setScreen: (screen: ScreenId) => void;
   setActiveCompanion: (npcId: string) => void;
+  setHomeScene: (index: number) => void;
   dismissDigest: () => void;
   pushToast: (message: string, tone?: Toast['tone']) => void;
 
@@ -115,6 +116,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   setActiveCompanion(npcId) {
     set((s) => ({ game: { ...s.game, activeCompanionId: npcId } }));
+    get().save();
+  },
+
+  setHomeScene(index) {
+    set((s) => ({ game: { ...s.game, homeSceneIndex: index } }));
     get().save();
   },
 

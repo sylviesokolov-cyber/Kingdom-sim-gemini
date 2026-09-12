@@ -81,26 +81,46 @@ border-radius: 14px;
 
 ## 3. The Home screen
 
-`02-home-screen-mockup.png` is the target. Zones, clockwise from top-left:
+**Home holds no companion interaction.** `02-home-screen-mockup.png` set the original visual
+target — illustration-first, dark-royal-gold, character-anchored — but as of the 2026-09-12
+redesign Home is the player's own chambers: a day-action hub with a purely decorative,
+idle-animated companion display. Talk, Gift, and Assist live in the Bonds tab
+(`CharactersScreen`) instead — see `docs/systems/BONDS.md`.
+
+Zones, clockwise from top-left:
 
 | Zone | Contents |
 |---|---|
-| **Player chip** (top-left) | Avatar, name, `Lv. 12 Refugee`, next-rank progress bar |
+| **Player chip** (top-left) | Avatar, name, `Lv. 12 Outsider`, next-estate progress bar |
 | **Currency bar** (top-center) | Copper, Guild Marks, Fate Crystals, Bond Hearts |
-| **Realm chip** (top-right) | `Day 1 · Morning`, settings, gallery |
+| **Realm chip** (top-right) | `Day 1`, weather, settings |
 | **Side rail** (left edge) | Mail · Quests · Events · Notice — each with an unread dot |
-| **Character stage** (center) | Full-bleed companion art over the cinematic background |
-| **Dialogue box** (center-low) | Name plate + spoken line, tap to cycle |
-| **Banner card** (bottom-left) | `Fateful Encounters`, SSR Rate Up, end date |
-| **Matters card** (bottom-center) | 3 daily bullets, each tappable into its system |
-| **Companion panel** (right) | Portrait, affection heart + bar, trait tags, quote, Talk/Gift/Bond, and the Profile · Outfits · Bond Story · Voice · More rail |
-| **Retinue strip** (right, low) | 5 avatars + overflow chevron, `5/11` |
-| **Bottom dock** | Home · Kingdom · Characters · Work · Market · Council · Summon · Inventory |
+| **Location label** (top-center, over the stage) | `Valenreach · {scene name} · Day {n}` |
+| **Character stage** (center) | The chosen companion, idle-animated, over the chambers backdrop |
+| **Stage controls** (bottom-center, over the stage) | Scene-cycle button + a companion-picker avatar strip — purely cosmetic, no dialogue or affection change |
+| **Day's Actions** (right) | A `.row-list` of live-status cards — Work, Market, Bonds, Kingdom, Summon, Council — each tapping straight into that tab |
+| **Bottom dock** | Home · Kingdom · Bonds · Work · Market · Council · Summon · Inventory |
 | **Next Day** (bottom-right) | The single largest button on the screen |
 
-**Rules:** the companion's face is never covered by a panel. The dialogue box sits in the lower
-third and stays clear of the character's head at every supported width. `Next Day` is always
-reachable by the right thumb.
+**The idle companion display ("L2D-style").** The roster is single flattened portraits, not
+rigged/layered Live2D source art, so this is a CSS approximation of the same feeling rather than
+real Live2D: a breathe-and-sway keyframe animation baked into the art (`@keyframes l2d-idle`),
+plus a slow parallax drift toward the pointer on desktop only (gated to `pointerType === 'mouse'`
+so touch dragging never triggers it, and to a `prefers-reduced-motion` check before it ever writes
+a CSS variable). See `.l2d-anchor` / `.stage-art` in `src/styles/home.css`.
+
+**Rules:** the companion's face is never covered by a panel. `Next Day` is always reachable by the
+right thumb. The stage controls never gate a mechanic — cycling the scene or the displayed
+companion is cosmetic, never an affection/trust change.
+
+### The Bonds tab
+
+Companion interaction's actual home. The roster grid opens a character detail modal containing,
+in order: portrait, traits + derived mood, the five relationship-dimension bars, a mood-varied
+quote, **Talk / Gift / Assist**, the Outfits/Bond Story/Gallery/Voice quick-links (disabled stubs
+until those systems land), condition, what she runs, what she wants/fears, her bond perks with
+live suspended/active state, her opinions of the rest of the cast, and her memory of the player.
+The gift picker reuses the same favourites-first sort as the old Home implementation did.
 
 ---
 
@@ -111,10 +131,10 @@ From `03-full-ui-screen-map.png`:
 | # | Screen | Identity | Primary content |
 |---|---|---|---|
 | 1 | Title | Key art + gold serif logotype | New Game · Continue · Settings · Gallery · Exit |
-| 2 | **Home / Throne** | Character-first throne room | The layout above |
+| 2 | **Home** | The player's chambers, day-action hub | The layout above — decorative only, no interaction |
 | 3 | Kingdom Map | Painted realm overview | District pins, vitals, supply chains, investment |
-| 4 | Character Roster | Gallery grid, rarity frames | Filter by faction, sort by rarity/affection |
-| 5 | Character Profile | Portrait + tabbed detail | Profile · Relationship · Outfits · Bond Scenes · Voice · Stories |
+| 4 | **Bonds** (Character Roster) | Gallery grid, rarity frames | Filter by faction, sort by rarity/affection |
+| 5 | Bonds detail (Character Profile) | Portrait + full detail | Talk/Gift/Assist · Relationship dimensions · Outfits · Bond Scenes · Voice · Stories |
 | 6 | Summon | Banner carousel | x1 / x10, pity counter, rate details, result reel |
 | 7 | Bond / VN Scene | Full-bleed cinematic | Dialogue, choices, Auto · Skip · Log |
 | 8 | Work / Career | Guild hall | Career tracks, jobs, energy cost, rank progress |
