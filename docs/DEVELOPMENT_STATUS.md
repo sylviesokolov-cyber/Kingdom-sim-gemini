@@ -131,6 +131,7 @@ Recorded so no future session relitigates them:
 | 2026-09-12 | `f7fc550` | pass | 81 pass | pass | pending | Engine foundation |
 | 2026-09-12 | `077af88` | pass | 81 pass | pass | **green** | Vertical slice — run 34683606087 |
 | 2026-09-12 | `66f4602` | pass | 81 pass | pass | **green** | CI hardening — run 34683745818 |
+| 2026-09-12 | `61686eb` | pass | 81 pass | pass | **green** | Path fix + Pages deploy — CI run 34684177803, deploy run 34684177817 |
 
 Run `82e5cfd` failed on a missing `@types/node`, fixed in `f7fc550`. Only the
 branch head gets a run when several commits are pushed together, so `f7fc550`
@@ -138,6 +139,20 @@ has no run of its own.
 
 CI results are recorded as `pending` until the run for the exact commit has
 been observed green. Do not mark them otherwise without checking.
+
+---
+
+## Live builds
+
+- **GitHub Pages:** https://sylviesokolov-cyber.github.io/Kingdom-sim-gemini/
+  Deploys automatically on every push to this branch (see
+  `.github/workflows/deploy-pages.yml`). Verified via a successful Actions
+  run (build + deploy jobs both green on `61686eb`); not fetched directly
+  from this sandbox, which blocks outbound requests to `github.io` by
+  network policy.
+- A one-off snapshot was also published as a Claude Artifact for immediate
+  mobile testing without waiting on Pages; that link is not durable the way
+  the Pages deploy is and won't reflect future commits.
 
 ---
 
