@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronRight, Eye, EyeOff, TrendingDown, Users } from 'lucide-react';
 import {
   IconBell,
@@ -48,6 +48,23 @@ export function HomeScreen({ hideUI, onToggleHideUI }: Props) {
   const interactedToday = useGameStore((s) => s.ui.interactedToday);
 
   const [showEvents, setShowEvents] = useState(false);
+  const sceneRef = useRef<HTMLDivElement>(null);
+
+  // Gentle pointer-parallax on the backdrop, echoing the Bonds stage's
+  // l2d-anchor drift. Skipped entirely under prefers-reduced-motion.
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const el = sceneRef.current;
+    if (!el) return;
+    const handleMove = (e: PointerEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      el.style.setProperty('--tiltX', `${(x * -10).toFixed(2)}px`);
+      el.style.setProperty('--tiltY', `${(y * -7).toFixed(2)}px`);
+    };
+    window.addEventListener('pointermove', handleMove);
+    return () => window.removeEventListener('pointermove', handleMove);
+  }, []);
 
   const day = game.clock.day;
   const live = useMemo(() => activeEvents(day), [day]);
@@ -116,7 +133,7 @@ export function HomeScreen({ hideUI, onToggleHideUI }: Props) {
 
   return (
     <section className="home">
-      <div className="scene-bg" style={{ backgroundImage: `url(${HOME_BACKGROUND})` }} />
+      <div ref={sceneRef} className="scene-bg" style={{ backgroundImage: `url(${HOME_BACKGROUND})` }} />
       <div className="scene-vignette" />
 
       <button

@@ -23,6 +23,30 @@
   overflow: hidden;
 }
 
+/* Gives the backdrop the same "living" quality as the Bonds stage's
+   l2d-idle loop, without character art: a slow Ken-Burns-style breathe
+   on the painted scene, plus a gentle pointer-parallax drift set by
+   HomeScreen via --tiltX/--tiltY. Both are inert under
+   prefers-reduced-motion (global reset in base.css zeroes the animation;
+   HomeScreen skips the pointer listener itself). */
+.home .scene-bg {
+  transform: scale(1.12) translate3d(var(--tiltX, 0px), var(--tiltY, 0px), 0);
+  transition: transform 500ms ease-out;
+  animation: home-scene-breathe 18000ms ease-in-out infinite;
+}
+
+@keyframes home-scene-breathe {
+  0%,
+  100% {
+    background-position: center 28%;
+    filter: saturate(1) brightness(0.8);
+  }
+  50% {
+    background-position: center 33%;
+    filter: saturate(1.05) brightness(0.83);
+  }
+}
+
 /* ------------------------------------------------------------------ *
  * Left utility rail
  * ------------------------------------------------------------------ */
