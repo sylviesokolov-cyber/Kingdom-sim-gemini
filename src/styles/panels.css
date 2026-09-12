@@ -442,6 +442,10 @@
   color: var(--rose-300);
 }
 
+.currency-energy {
+  color: var(--jade-500);
+}
+
 .hud-right {
   display: flex;
   align-items: center;
@@ -492,7 +496,24 @@
   }
 
   .hud-player-id {
+    min-width: 0;
+    max-width: 128px;
+  }
+
+  .hud-progress {
     display: none;
+  }
+
+  .hud-name {
+    font-size: 12px;
+  }
+
+  .hud-name .label {
+    display: none;
+  }
+
+  .hud-estate {
+    font-size: 8px;
   }
 
   .hud-currencies {
@@ -506,5 +527,11 @@
 
   .hud-clock .label {
     display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .hud-player-id {
+    max-width: 96px;
   }
 }

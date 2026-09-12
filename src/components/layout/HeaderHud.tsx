@@ -1,4 +1,4 @@
-import { Coins, Gem, Heart, Scroll, Settings, Sun, Moon, CloudRain, Snowflake } from 'lucide-react';
+import { Coins, Gem, Heart, Scroll, Settings, Sun, Moon, CloudRain, Snowflake, Zap } from 'lucide-react';
 import type { GameState } from '../../types';
 import { getEstateTier } from '../../engine/progression';
 import { ESTATE_LADDER, CAREER_DEFINITIONS, rankName } from '../../content/progression';
@@ -63,6 +63,11 @@ export function HeaderHud({ game, onOpenSettings }: Props) {
       </div>
 
       <div className="hud-currencies">
+        <Currency
+          icon={<Zap size={13} />}
+          value={`${Math.round(player.vitals.energy)}/${player.vitals.maxEnergy}`}
+          tone="energy"
+        />
         <Currency icon={<Coins size={13} />} value={short(player.currencies.copper)} tone="gold" />
         <Currency icon={<Scroll size={13} />} value={short(player.currencies.guildMarks)} tone="parchment" />
         <Currency icon={<Gem size={13} />} value={short(player.currencies.fateCrystals)} tone="crystal" />

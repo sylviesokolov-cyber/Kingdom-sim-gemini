@@ -33,7 +33,8 @@ export type ScreenId =
   | 'market'
   | 'council'
   | 'summon'
-  | 'inventory';
+  | 'inventory'
+  | 'profile';
 
 interface UiState {
   screen: ScreenId;
