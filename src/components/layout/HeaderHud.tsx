@@ -47,12 +47,12 @@ export function HeaderHud({ game, onOpenSettings }: Props) {
       <div className="hud-player">
         <div className="hud-avatar">
           <Scroll size={18} />
+          <span className="hud-level-badge" title={`Level ${player.level}`}>
+            {player.level}
+          </span>
         </div>
         <div className="hud-player-id">
-          <div className="hud-name">
-            {player.name}
-            <span className="label"> Lv.{player.level}</span>
-          </div>
+          <div className="hud-name">{player.name}</div>
           <div className="hud-estate" title={player.estate}>
             {roleLabel}
           </div>
@@ -103,7 +103,7 @@ function Currency({
 }) {
   return (
     <div className={`currency currency-${tone}`}>
-      {icon}
+      <span className="currency-icon">{icon}</span>
       <span className="numeral">{value}</span>
     </div>
   );

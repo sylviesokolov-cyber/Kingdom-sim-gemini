@@ -320,6 +320,47 @@ Driven with Playwright at 900x420 and 740x360, landscape.
 
 ## Change log
 
+### 2026-09-12 — HUD and dock visual polish pass
+Owner feedback on a screenshot: the top HUD's currency row read as a flat
+semi-transparent bar rather than a finished game's chrome, icons were plain
+line-art with no shine, and the player level had no visible badge next to
+the top-left role. Style-only pass — no element moved, no new state.
+
+- **HUD bar** (`panels.css`): replaced the translucent top-to-bottom
+  gradient with an opaque wine/ink gradient bar plus a gold hairline and
+  drop shadow, so it reads as a solid piece of chrome instead of a
+  see-through overlay.
+- **Currency chips** (`panels.css`, `HeaderHud.tsx`): the single shared
+  translucent pill around all five currency readouts is gone. Each
+  currency (energy/copper/guild marks/crystals/hearts) is now its own
+  bordered pill with a circular icon badge — a radial highlight plus a
+  tone-matched glow (gold/jade/rose/cyan) behind the icon — giving each a
+  "shining" gem/emblem look instead of a flat line icon.
+  `Currency` now wraps its icon in a `.currency-icon` span for this.
+- **Level badge** (`HeaderHud.tsx`, `panels.css`): the inline "Lv.N" text
+  next to the player name is replaced with a small gold circular badge
+  overlaid on the corner of the top-left avatar (`.hud-level-badge`),
+  matching how the reference mockup surfaces level as a badge rather than
+  inline text. The role/estate line is unchanged in position and content.
+  The avatar itself gained a specular highlight and stronger drop shadow.
+- **Clock chip and settings button** (`panels.css`): restyled to match the
+  new currency-chip material (opaque gradient, gold border, icon glow);
+  the settings button and clock icon are now circular badges instead of
+  flat squares.
+- **Dock** (`home.css`): same opaque-bar treatment as the HUD (was a
+  translucent gradient), and the selected tab now gets a gold glow behind
+  its icon (`drop-shadow`) plus a brighter highlighted background, instead
+  of a flat tinted rectangle.
+- No layout, position, or gameplay change — purely `panels.css`/`home.css`
+  materials plus the two markup additions above (icon wrapper span, level
+  badge span) needed to hang the new styling on.
+- Verified: `npm run typecheck`, all 87 tests, and `npm run build` pass.
+  Checked via a Playwright screenshot against the production preview build
+  at 740×360 and 1200×560 (Home) and 900×420 (Kingdom, Bonds) — HUD and
+  dock render with no overlapping chrome and no console errors; the rest
+  of each screen is visually unaffected since only shared HUD/dock/button
+  primitives changed.
+
 ### 2026-09-12 — HUD fixes and a new Character sheet tab
 Owner feedback on the previous entry's screenshot, taken at landscape-phone
 width: the HUD's name/role was invisible (a pre-existing `display: none`
