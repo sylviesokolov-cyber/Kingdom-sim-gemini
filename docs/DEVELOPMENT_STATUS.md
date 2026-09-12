@@ -344,7 +344,8 @@ Recorded so no future session relitigates them:
 | 2026-09-12 | `27f2ded` | pass | 81 pass | pass | **green** | Home reverted to a companion-free kingdom dashboard — CI run 34699540794, deploy run 34699540567 |
 | 2026-09-12 | `aaf1ca1` | pass | 87 pass | pass | not run | HUD/dock polish — no run of its own; pushed to the base branch together with `398708e` below |
 | 2026-09-12 | `398708e` | pass | 87 pass | pass | **green** | HUD bar removed + original icon set, fast-forwarded onto the base branch — CI run 34719926595, deploy run 34719926600 |
-| 2026-09-12 | `7a159e4` | pass | 115 pass | pass | pending | Career progression made reachable — rank trials, `applyEffect`, real attributes, throne routes. Browser-verified at 740x360/900x420. CI not yet observed. |
+| 2026-09-12 | `7a159e4` | pass | 115 pass | pass | **green** | Career progression made reachable — rank trials, `applyEffect`, real attributes, throne routes. Browser-verified at 740x360/900x420. CI run 34722170630 |
+| 2026-09-12 | `ed665b9` | pass | 115 pass | pass | pending | Design analysis + doc updates. Docs only — no source changed from `7a159e4`. CI run 34722625325 sat in its Test step for 8+ minutes against code that passed in ~85s on the previous run; not observed green, so not recorded as such. |
 
 Run `82e5cfd` failed on a missing `@types/node`, fixed in `f7fc550`. Only the
 branch head gets a run when several commits are pushed together, so `f7fc550`
@@ -434,8 +435,8 @@ ungateable and throne routes unreachable.
   progression audit; NPC and event design; and a revised phase ordering that
   moves the event and story engines ahead of further simulation depth.
 - Verified: `npm run typecheck`, 115 tests (28 new across
-  `tests/effects.test.ts` and `tests/career.test.ts`), `npm run build`. CI not
-  yet observed for this commit.
+  `tests/effects.test.ts` and `tests/career.test.ts`), `npm run build`, and CI
+  run 34722170630 green on the exact commit `7a159e4`.
 - Verified in the browser against the production preview build (Playwright,
   740x360 and 900x420 landscape): the trial block and the throne-route rows
   render legibly, no console errors, no horizontal overflow at either size.
