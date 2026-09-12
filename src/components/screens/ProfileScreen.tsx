@@ -1,6 +1,6 @@
 import { Award, Coins, Flag, Heart, ScrollText, Shield, Skull, Sparkles, Zap } from 'lucide-react';
 import { useGameStore } from '../../state/store';
-import { getEstateTier } from '../../engine/progression';
+import { getEstateTier, throneRoutesAvailable } from '../../engine/progression';
 import { CAREER_DEFINITIONS, ESTATE_LADDER, estateIndex, rankName } from '../../content/progression';
 import { FACTION_LIST } from '../../content/factions';
 import { ATTRIBUTES } from '../../types';
@@ -31,6 +31,8 @@ export function ProfileScreen() {
   const { player } = game;
   const tier = getEstateTier(player.estate);
   const currentIndex = estateIndex(player.estate);
+
+  const routes = throneRoutesAvailable(game);
 
   const topCareer = Object.values(player.careers)
     .filter((c) => c.rank > 0)
@@ -84,7 +86,7 @@ export function ProfileScreen() {
             {ATTRIBUTES.map((a) => (
               <div key={a} className="stat">
                 <div className="label">{ATTRIBUTE_LABELS[a]}</div>
-                <div className="stat-value">{player.attributes[a]}</div>
+                <div className="stat-value">{Math.floor(player.attributes[a])}</div>
               </div>
             ))}
           </div>
@@ -121,6 +123,29 @@ export function ProfileScreen() {
           </div>
           <div className="panel" style={{ padding: 12, marginBottom: 12 }}>
             <CareerTrackList game={game} />
+          </div>
+
+          <div className="label" style={{ marginBottom: 6 }}>
+            Routes to the throne
+          </div>
+          <div className="panel" style={{ padding: 12, marginBottom: 12 }}>
+            {routes.map(({ route, eligible, blockers, progress }) => (
+              <div key={route.id} className={`route-row ${eligible ? 'open' : ''}`}>
+                <div className="route-head">
+                  <span className="route-name">{route.name}</span>
+                  <span className="label">{eligible ? 'open' : `${Math.round(progress * 100)}%`}</span>
+                </div>
+                <p className="route-sub">{route.howYouTakeIt}</p>
+                <div className="bar bar-gold">
+                  <i style={{ width: `${Math.round(progress * 100)}%` }} />
+                </div>
+                {!eligible && blockers.length > 0 && (
+                  <div className="route-blocker" style={{ marginTop: 3 }}>
+                    {blockers[0]}
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
 
           <div className="label" style={{ marginBottom: 6 }}>

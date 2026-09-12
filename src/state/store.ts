@@ -14,7 +14,9 @@ import { RESOURCES } from '../content/resources';
 import { simulateDay } from '../engine/simulation';
 import { activePerks, applyInteraction, applyJealousy, perkMultiplier } from '../engine/relationships';
 import { applyPlayerTrade, buyPrice, sellPrice } from '../engine/economy';
-import { applyXp, canPromoteEstate, promoteEstate, standingGain } from '../engine/progression';
+import { canPromoteEstate, promoteEstate } from '../engine/progression';
+import { applyEffect } from '../engine/effects';
+import { completeTrial, jobEffect } from '../engine/career';
 import { pullCost, resolveMultiPull } from '../engine/gacha';
 import { createRng } from '../engine/rng';
 import { clearSave, loadSave, writeSave } from './save';
@@ -72,6 +74,7 @@ export interface GameStore {
   sell: (resourceId: string, quantity: number) => void;
   consume: (resourceId: string) => void;
   petitionEstate: () => void;
+  attemptTrial: (trialId: string) => void;
   summon: (banner: BannerDefinition, count: number) => void;
 }
 
@@ -289,98 +292,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const r = job.rewards;
     const timesDone = game.player.deeds.filter((d) => d === `job:${jobId}`).length;
 
-    let player = { ...game.player };
+    // The whole reward goes through the one effect applier; `jobEffect` is
+    // what the shift is worth this many repetitions in.
+    const applied = applyEffect(game, jobEffect(job, timesDone));
 
-    player.vitals = { ...player.vitals, energy: player.vitals.energy - job.energyCost };
-    player.currencies = {
-      ...player.currencies,
-      copper: player.currencies.copper + (r.copper ?? 0),
-      guildMarks: player.currencies.guildMarks + (r.guildMarks ?? 0),
+    let next: GameState = applied.state;
+    next = {
+      ...next,
+      player: { ...next.player, deeds: [...next.player.deeds, `job:${jobId}`] },
     };
-    player.standingPoints += standingGain(r.standingPoints ?? 0, timesDone);
-    player.bounty += r.bounty ?? 0;
-    player.deeds = [...player.deeds, `job:${jobId}`];
-
-    const leveled = applyXp(player, r.xp ?? 0);
-    player.level = leveled.level;
-    player.xp = leveled.xp;
-    player.xpToNext = leveled.xpToNext;
-    if (leveled.levelsGained > 0) {
-      player.attributes = Object.fromEntries(
-        Object.entries(player.attributes).map(([k, v]) => [k, v + leveled.levelsGained]),
-      ) as typeof player.attributes;
-    }
-
-    if (r.careerXp) {
-      const careers = { ...player.careers };
-      for (const gain of r.careerXp) {
-        careers[gain.track] = { ...careers[gain.track], xp: careers[gain.track].xp + gain.amount };
-      }
-      player.careers = careers;
-    }
-
-    if (r.items) {
-      const inventory = { ...player.inventory };
-      for (const item of r.items) {
-        inventory[item.resourceId] = (inventory[item.resourceId] ?? 0) + item.amount;
-      }
-      player.inventory = inventory;
-    }
-
-    if (r.factions) {
-      const standing = { ...player.standing };
-      for (const impact of r.factions) {
-        standing[impact.factionId] = Math.max(
-          0,
-          Math.min(100, standing[impact.factionId] + (impact.opinion ?? 0)),
-        );
-      }
-      player.standing = standing;
-    }
-
-    let factions = game.factions;
-    if (r.factions) {
-      factions = { ...factions };
-      for (const impact of r.factions) {
-        const f = factions[impact.factionId];
-        if (!f) continue;
-        factions[impact.factionId] = {
-          ...f,
-          opinion: Math.max(0, Math.min(100, f.opinion + (impact.opinion ?? 0))),
-        };
-      }
-    }
-
-    let kingdom = game.kingdom;
-    if (r.kingdom) {
-      kingdom = { ...kingdom };
-      for (const [key, delta] of Object.entries(r.kingdom)) {
-        const k = key as keyof typeof kingdom;
-        (kingdom[k] as number) = Math.max(0, (kingdom[k] as number) + (delta ?? 0));
-      }
-    }
 
     // Working under a supervisor builds the relationship with her.
-    let npcs = game.npcs;
     if (job.supervisorNpcId && job.supervisorAffection) {
-      const npc = npcs[job.supervisorNpcId];
+      const npc = next.npcs[job.supervisorNpcId];
       const def = NPCS_BY_ID[job.supervisorNpcId];
       if (npc && def) {
-        npcs = {
-          ...npcs,
-          [job.supervisorNpcId]: {
-            ...npc,
-            relationship: {
-              ...npc.relationship,
-              affection: Math.min(100, npc.relationship.affection + job.supervisorAffection),
-              trust: Math.min(100, npc.relationship.trust + 1),
+        next = {
+          ...next,
+          npcs: {
+            ...next.npcs,
+            [job.supervisorNpcId]: {
+              ...npc,
+              relationship: {
+                ...npc.relationship,
+                affection: Math.min(100, npc.relationship.affection + job.supervisorAffection),
+                trust: Math.min(100, npc.relationship.trust + 1),
+              },
             },
           },
         };
       }
     }
 
-    const next: GameState = { ...game, player, npcs, factions, kingdom };
     set({
       game: next,
       ui: job.supervisorNpcId
@@ -389,8 +332,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
 
     get().pushToast(`${job.title} — earned ${r.copper ?? 0} copper.`, 'good');
-    if (leveled.levelsGained > 0) {
-      get().pushToast(`Level ${leveled.level}. Every attribute rises.`, 'good');
+    for (const note of applied.notes) {
+      get().pushToast(note.message, note.tone);
     }
     get().save();
   },
@@ -517,6 +460,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   /* ---------------------------------------------------------------- */
+  attemptTrial(trialId) {
+    const { game } = get();
+    const result = completeTrial(game, trialId);
+
+    if (!result.passed) {
+      get().pushToast(result.reasons[0] ?? 'Not yet.', 'bad');
+      return;
+    }
+
+    set({ game: result.state });
+    get().pushToast(`${result.newRankName}. The trial is behind you.`, 'good');
+    for (const note of result.notes) {
+      get().pushToast(note.message, note.tone);
+    }
+    get().save();
+  },
+
   summon(banner, count) {
     const { game, ui } = get();
     const cost = pullCost(banner, count);

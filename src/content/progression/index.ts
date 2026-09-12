@@ -125,7 +125,7 @@ export const CAREER_DEFINITIONS: Record<CareerTrack, CareerTrackDefinition> = {
     icon: 'church',
     rankNames: ['Acolyte', 'Deacon', 'Priest', 'Canon', 'Bishop'],
     xpThresholds: [80, 260, 700, 1600, 3400],
-    factionFloors: [10, 25, 45, 65, 80],
+    factionFloors: [0, 25, 45, 65, 80],
     trials: ['trial_clergy_1', 'trial_clergy_2', 'trial_clergy_3', 'trial_clergy_4', 'trial_clergy_5'],
   },
   merchant: {
@@ -136,7 +136,7 @@ export const CAREER_DEFINITIONS: Record<CareerTrack, CareerTrackDefinition> = {
     icon: 'scale',
     rankNames: ['Hawker', 'Trader', 'Factor', 'Merchant', 'Magnate'],
     xpThresholds: [80, 260, 700, 1600, 3400],
-    factionFloors: [10, 25, 45, 65, 80],
+    factionFloors: [0, 25, 45, 65, 80],
     trials: ['trial_merchant_1', 'trial_merchant_2', 'trial_merchant_3', 'trial_merchant_4', 'trial_merchant_5'],
   },
   martial: {
@@ -147,7 +147,7 @@ export const CAREER_DEFINITIONS: Record<CareerTrack, CareerTrackDefinition> = {
     icon: 'swords',
     rankNames: ['Levy', 'Man-at-Arms', 'Sergeant', 'Knight', 'Marshal'],
     xpThresholds: [80, 260, 700, 1600, 3400],
-    factionFloors: [10, 25, 45, 65, 80],
+    factionFloors: [0, 25, 45, 65, 80],
     trials: ['trial_martial_1', 'trial_martial_2', 'trial_martial_3', 'trial_martial_4', 'trial_martial_5'],
   },
   court: {
@@ -158,7 +158,7 @@ export const CAREER_DEFINITIONS: Record<CareerTrack, CareerTrackDefinition> = {
     icon: 'scroll',
     rankNames: ['Clerk', 'Steward', 'Chamberlain', 'Minister', 'Chancellor'],
     xpThresholds: [80, 260, 700, 1600, 3400],
-    factionFloors: [10, 25, 45, 65, 80],
+    factionFloors: [0, 25, 45, 65, 80],
     trials: ['trial_court_1', 'trial_court_2', 'trial_court_3', 'trial_court_4', 'trial_court_5'],
   },
   shadow: {
@@ -169,7 +169,7 @@ export const CAREER_DEFINITIONS: Record<CareerTrack, CareerTrackDefinition> = {
     icon: 'skull',
     rankNames: ['Cutpurse', 'Runner', 'Fixer', 'Underboss', 'Kingpin'],
     xpThresholds: [80, 260, 700, 1600, 3400],
-    factionFloors: [10, 25, 45, 65, 80],
+    factionFloors: [0, 25, 45, 65, 80],
     trials: ['trial_shadow_1', 'trial_shadow_2', 'trial_shadow_3', 'trial_shadow_4', 'trial_shadow_5'],
   },
   scholar: {
@@ -217,3 +217,11 @@ export function rankName(track: CareerTrack, rank: number): string {
   if (rank <= 0) return 'Untracked';
   return CAREER_DEFINITIONS[track].rankNames[rank - 1] ?? 'Unknown';
 }
+
+/* ------------------------------------------------------------------ *
+ * Re-exports — trials and throne routes are authored in their own
+ * files, but every consumer wants them from `content/progression`.
+ * ------------------------------------------------------------------ */
+
+export { CAREER_TRIALS, TRIALS_BY_ID, trialFor } from './trials';
+export { THRONE_ROUTES } from './throne';

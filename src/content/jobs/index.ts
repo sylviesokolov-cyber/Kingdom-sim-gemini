@@ -18,6 +18,7 @@ export const JOBS: JobDefinition[] = [
     requires: {},
     supervisorAffection: 3,
     rewards: {
+      attributes: { might: 0.25 },
       copper: 26,
       xp: 12,
       standingPoints: 6,
@@ -35,6 +36,7 @@ export const JOBS: JobDefinition[] = [
     requires: {},
     supervisorAffection: 3,
     rewards: {
+      attributes: { might: 0.2, charm: 0.1 },
       copper: 22,
       xp: 10,
       standingPoints: 5,
@@ -51,6 +53,7 @@ export const JOBS: JobDefinition[] = [
     requires: {},
     supervisorAffection: 4,
     rewards: {
+      attributes: { might: 0.3 },
       copper: 28,
       xp: 12,
       standingPoints: 6,
@@ -69,6 +72,7 @@ export const JOBS: JobDefinition[] = [
     track: 'scholar',
     supervisorAffection: 4,
     rewards: {
+      attributes: { cunning: 0.3, piety: 0.1 },
       copper: 20,
       xp: 12,
       standingPoints: 5,
@@ -89,12 +93,13 @@ export const JOBS: JobDefinition[] = [
     requires: { estate: 'Peasant' },
     supervisorAffection: 4,
     rewards: {
+      attributes: { cunning: 0.35, charm: 0.2 },
       copper: 48,
       xp: 16,
       standingPoints: 8,
       guildMarks: 2,
       careerXp: [{ track: 'merchant', amount: 22 }],
-      attributes: { cunning: 0 },
+      factions: [{ factionId: 'guilds', opinion: 1 }],
     },
   },
   {
@@ -108,6 +113,7 @@ export const JOBS: JobDefinition[] = [
     requires: { estate: 'Villager', career: [{ track: 'merchant', minRank: 2 }] },
     supervisorAffection: 3,
     rewards: {
+      attributes: { cunning: 0.5, charm: 0.3, authority: 0.15 },
       copper: 140,
       xp: 30,
       standingPoints: 14,
@@ -129,12 +135,13 @@ export const JOBS: JobDefinition[] = [
     requires: { estate: 'Peasant' },
     supervisorAffection: 5,
     rewards: {
+      attributes: { might: 0.4, authority: 0.15 },
       copper: 38,
       xp: 18,
       standingPoints: 8,
       guildMarks: 2,
       careerXp: [{ track: 'martial', amount: 24 }],
-      attributes: { might: 0 },
+      factions: [{ factionId: 'military', opinion: 1 }],
     },
   },
   {
@@ -148,6 +155,7 @@ export const JOBS: JobDefinition[] = [
     requires: { estate: 'Villager', career: [{ track: 'martial', minRank: 2 }] },
     supervisorAffection: 2,
     rewards: {
+      attributes: { might: 0.5, authority: 0.3 },
       copper: 95,
       xp: 28,
       standingPoints: 13,
@@ -170,6 +178,7 @@ export const JOBS: JobDefinition[] = [
     requires: {},
     supervisorAffection: 5,
     rewards: {
+      attributes: { piety: 0.35, charm: 0.2 },
       copper: 18,
       xp: 16,
       standingPoints: 10,
@@ -193,6 +202,7 @@ export const JOBS: JobDefinition[] = [
     requires: { estate: 'Villager', career: [{ track: 'clergy', minRank: 2 }] },
     supervisorAffection: 4,
     rewards: {
+      attributes: { piety: 0.5, charm: 0.3, authority: 0.15 },
       copper: 70,
       xp: 26,
       standingPoints: 15,
@@ -215,6 +225,7 @@ export const JOBS: JobDefinition[] = [
     requires: { estate: 'Peasant' },
     supervisorAffection: 5,
     rewards: {
+      attributes: { authority: 0.35, cunning: 0.2 },
       copper: 32,
       xp: 16,
       standingPoints: 7,
@@ -223,6 +234,7 @@ export const JOBS: JobDefinition[] = [
         { track: 'court', amount: 20 },
         { track: 'scholar', amount: 10 },
       ],
+      factions: [{ factionId: 'crown', opinion: 1 }],
       kingdom: { literacy: 1 },
     },
   },
@@ -240,6 +252,7 @@ export const JOBS: JobDefinition[] = [
     requires: {},
     supervisorAffection: 4,
     rewards: {
+      attributes: { cunning: 0.4, might: 0.1 },
       copper: 88,
       xp: 16,
       standingPoints: 3,
@@ -264,6 +277,7 @@ export const JOBS: JobDefinition[] = [
     track: 'merchant',
     supervisorAffection: 4,
     rewards: {
+      attributes: { charm: 0.25, cunning: 0.1 },
       copper: 34,
       xp: 13,
       standingPoints: 6,
@@ -281,6 +295,7 @@ export const JOBS: JobDefinition[] = [
     requires: { estate: 'Peasant' },
     supervisorAffection: 3,
     rewards: {
+      attributes: { might: 0.35 },
       copper: 52,
       xp: 18,
       standingPoints: 8,
@@ -298,6 +313,7 @@ export const JOBS: JobDefinition[] = [
     requires: { estate: 'Peasant' },
     supervisorAffection: 4,
     rewards: {
+      attributes: { cunning: 0.4, piety: 0.15 },
       copper: 58,
       xp: 22,
       standingPoints: 9,

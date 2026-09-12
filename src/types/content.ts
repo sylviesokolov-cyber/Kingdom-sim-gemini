@@ -92,6 +92,67 @@ export interface JobDefinition {
 }
 
 /* ------------------------------------------------------------------ *
+ * Career rank trials
+ * ------------------------------------------------------------------ */
+
+/**
+ * The capstone of a career rank. XP and faction standing say you are ready;
+ * the trial is the thing you actually have to do, and it is deliberately not
+ * purchasable — it reads attributes, bonds, estate and flags, so a rank is
+ * evidence of a life lived rather than of copper spent.
+ *
+ * Content is data (CLAUDE.md §5.5): a new rank is a new entry here, never a
+ * new branch in the work hall.
+ */
+export interface CareerTrialDefinition {
+  id: string;
+  track: CareerTrack;
+  /** The rank this trial admits the player to, 1-5. */
+  rank: number;
+  title: string;
+  /** What the trial asks of him, in the world's voice. */
+  description: string;
+  /** The NPC who sets the trial and judges it. */
+  examinerNpcId: string;
+  /**
+   * What the trial demands beyond the track's own XP and faction floor.
+   * Bond requirements here are the point, not decoration: the people who
+   * run an institution decide who rises inside it.
+   */
+  requires: Prerequisite;
+  /** Paid on undertaking. Negative entries are the cost. */
+  cost: Effect;
+  /** Granted on completion. */
+  rewards: Effect;
+  /** Read out when the trial resolves. */
+  outcome: string;
+}
+
+/* ------------------------------------------------------------------ *
+ * Routes to the throne
+ * ------------------------------------------------------------------ */
+
+/**
+ * One of the six ways the crown changes hands (PROGRESSION.md §4).
+ *
+ * `requires` is the political qualification — what your life has to have
+ * built for this route to be yours to take — declared in the same
+ * `Prerequisite` vocabulary as everything else so a locked route explains
+ * itself instead of greying out.
+ */
+export interface ThroneRouteDefinition {
+  id: string;
+  name: string;
+  /** The track whose apex this route belongs to, if any. */
+  track?: CareerTrack;
+  /** How the crown actually changes hands on this route. */
+  howYouTakeIt: string;
+  /** What this reign is, for a player choosing between them. */
+  character: string;
+  requires: Prerequisite;
+}
+
+/* ------------------------------------------------------------------ *
  * Events
  * ------------------------------------------------------------------ */
 

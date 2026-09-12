@@ -1,11 +1,21 @@
-import type { CareerTrack, Estate, PlayerState, FactionState, FactionId } from '../../types';
+import type {
+  CareerTrack,
+  Estate,
+  GameState,
+  PlayerState,
+  FactionState,
+  FactionId,
+  ThroneRouteDefinition,
+} from '../../types';
 import {
   CAREER_DEFINITIONS,
   ESTATE_LADDER,
+  THRONE_ROUTES,
   TRACK_ANTAGONISMS,
   estateIndex,
   getEstateTier,
 } from '../../content/progression';
+import { evaluatePrerequisite } from '../prerequisites';
 
 export interface Eligibility {
   eligible: boolean;
@@ -152,17 +162,24 @@ export function nextEstate(estate: Estate): Estate | undefined {
 export { getEstateTier };
 
 /**
- * Standing from repeating the same source has sharply diminishing returns.
- * The game wants a varied life, not one job ground three hundred times.
+ * How much a reward is worth the Nth time you do the same thing.
+ *
+ * The game wants a varied life, not one job ground three hundred times, so
+ * repetition decays sharply. This is the shared curve: standing and attribute
+ * training both read it, because a player who hauls water four hundred times
+ * should not out-train a knight on might any more than he should out-rank a
+ * courtier on reputation.
  */
-export function standingGain(
-  base: number,
-  timesPerformed: number,
-): number {
-  if (timesPerformed <= 3) return base;
-  if (timesPerformed <= 8) return base * 0.6;
-  if (timesPerformed <= 20) return base * 0.3;
-  return base * 0.1;
+export function repetitionFactor(timesPerformed: number): number {
+  if (timesPerformed <= 3) return 1;
+  if (timesPerformed <= 8) return 0.6;
+  if (timesPerformed <= 20) return 0.3;
+  return 0.1;
+}
+
+/** Standing from repeating the same source has sharply diminishing returns. */
+export function standingGain(base: number, timesPerformed: number): number {
+  return base * repetitionFactor(timesPerformed);
 }
 
 export interface LevelResult {
@@ -186,3 +203,57 @@ export function applyXp(player: PlayerState, amount: number): LevelResult {
 
   return { level, xp, xpToNext, levelsGained };
 }
+
+/* ------------------------------------------------------------------ *
+ * Routes to the throne
+ * ------------------------------------------------------------------ */
+
+export interface ThroneRouteStatus {
+  route: ThroneRouteDefinition;
+  eligible: boolean;
+  /** Why it is not open yet, in the same voice as every other gate. */
+  blockers: string[];
+  /** How many of the route's conditions are already met, 0-1. */
+  progress: number;
+}
+
+/**
+ * Which routes to the throne the player currently qualifies for, and how far
+ * off the rest are.
+ *
+ * Eligibility on several routes at once is a choice point, not a stacking
+ * bonus (PROGRESSION.md §4) — so this returns every route with its status
+ * rather than a single "best" one.
+ */
+export function throneRoutesAvailable(state: GameState): ThroneRouteStatus[] {
+  return THRONE_ROUTES.map((route) => {
+    const result = evaluatePrerequisite(route.requires, state);
+    const blockers = result.failures.map((f) => `${f.requirement} — ${f.actual}`);
+
+    // Conditions are counted as "one per stated requirement", which is what
+    // the player sees listed, so the bar matches the list underneath it.
+    const total = countConditions(route);
+    const met = Math.max(0, total - result.failures.length);
+
+    return {
+      route,
+      eligible: result.met,
+      blockers,
+      progress: total === 0 ? 1 : met / total,
+    };
+  });
+}
+
+function countConditions(route: ThroneRouteDefinition): number {
+  const r = route.requires;
+  return (
+    (r.career?.length ?? 0) +
+    (r.faction?.length ?? 0) +
+    (r.bond?.length ?? 0) +
+    (r.flags?.all?.length ?? 0) +
+    Object.keys(r.kingdom ?? {}).length +
+    (r.estate ? 1 : 0)
+  );
+}
+
+export { THRONE_ROUTES };

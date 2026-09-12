@@ -14,6 +14,7 @@ export function WorkScreen() {
   const game = useGameStore((s) => s.game);
   const workJob = useGameStore((s) => s.workJob);
   const petitionEstate = useGameStore((s) => s.petitionEstate);
+  const attemptTrial = useGameStore((s) => s.attemptTrial);
   const [track, setTrack] = useState<CareerTrack | 'all'>('all');
 
   const jobs = useMemo(
@@ -120,7 +121,7 @@ export function WorkScreen() {
             <div className="label" style={{ marginBottom: 6 }}>
               Career Tracks
             </div>
-            <CareerTrackList game={game} />
+            <CareerTrackList game={game} onAttemptTrial={attemptTrial} />
           </div>
         </div>
       </div>
