@@ -129,7 +129,11 @@ Recorded so no future session relitigates them:
 |---|---|---|---|---|---|---|
 | 2026-09-12 | `82e5cfd` | — | — | — | not run | Docs and assets only |
 | 2026-09-12 | `f7fc550` | pass | 81 pass | pass | pending | Engine foundation |
-| 2026-09-12 | (this commit) | pass | 81 pass | pass | pending | Vertical slice |
+| 2026-09-12 | `077af88` | pass | 81 pass | pass | **green** | Vertical slice — run 34683606087, all steps success |
+
+Run `82e5cfd` failed on a missing `@types/node`, fixed in `f7fc550`. Only the
+branch head gets a run when several commits are pushed together, so `f7fc550`
+has no run of its own.
 
 CI results are recorded as `pending` until the run for the exact commit has
 been observed green. Do not mark them otherwise without checking.
