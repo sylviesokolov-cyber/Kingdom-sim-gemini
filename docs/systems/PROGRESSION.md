@@ -120,22 +120,72 @@ Level is a summary stat: it ticks from total XP and grants +1 to all attributes 
 ## 6. Implementation notes
 
 ```
-src/types/progression.ts      Estate, CareerTrack, CareerRank, Attribute types
-src/content/progression/      estate ladder, track definitions, trial quest ids
+src/types/core.ts             Estate, CareerTrack, Attribute
+src/types/player.ts           PlayerState, CareerState
+src/types/content.ts          CareerTrialDefinition, ThroneRouteDefinition
+src/content/progression/      estate ladder, track definitions
+src/content/progression/trials.ts   the 30 rank trials
+src/content/progression/throne.ts   the six throne routes
 src/engine/progression/       pure rank/XP/eligibility functions
+src/engine/career/            trial resolution and job reward shaping
+src/engine/effects/           applyEffect — where an Effect becomes state
 ```
+
+**Why trial resolution is not in `engine/progression`.** Resolving a trial
+means applying an `Effect`, and `engine/effects` already depends on
+`engine/progression` for the XP curve. Putting resolution in progression would
+close that into an import cycle. Pure rank arithmetic stays in progression;
+the part that *spends and grants* lives in `engine/career`.
 
 Required pure functions:
 
 ```ts
-canPromoteEstate(player, patron): EstateEligibility
-promoteEstate(player, patron): PlayerState
-canAdvanceCareer(player, track): CareerEligibility   // includes antagonism caps
+// engine/progression — implemented and tested
+canPromoteEstate(player, factions): Eligibility
+promoteEstate(player): PlayerState
+canAdvanceCareer(player, track, factions): Eligibility  // includes antagonism caps
 advanceCareer(player, track): PlayerState
-awardStanding(player, source, amount): PlayerState    // applies diminishing returns
-effectiveCareerCap(player, track): number             // antagonism resolution
-throneRoutesAvailable(player, factions, npcs): ThroneRoute[]
+effectiveCareerCap(player, track): number               // antagonism resolution
+standingGain(base, timesPerformed): number              // diminishing returns
+repetitionFactor(timesPerformed): number                // the shared decay curve
+throneRoutesAvailable(state): ThroneRouteStatus[]
+
+// engine/career — implemented and tested
+nextTrial(player, track): CareerTrialDefinition | undefined
+canAttemptTrial(state, trialId): TrialEligibility        // every gate, as sentences
+completeTrial(state, trialId): TrialResult               // pay, record, advance, grant
+jobEffect(job, timesPerformed): Effect                   // what a shift is worth now
+
+// not yet implemented
+promoteEstate(player, patron)   // §2 requires a patron; promotion currently takes none
 ```
 
 All of these must be covered by tests. Antagonism caps and diminishing standing returns are the
 two easiest things in this system to get quietly wrong.
+
+---
+
+## 7. Rank trials
+
+Each rank's trial is authored data in `content/progression/trials.ts`. Three
+rules hold across the whole set:
+
+1. **Not purchasable.** A trial reads attributes, estate, flags and bonds.
+   Copper is at most a fee, never the qualification.
+2. **Bonds are the lever.** From rank 3 up, every trial names a woman whose
+   trust is required. The people who run an institution decide who rises in it.
+3. **The two axes pull each other up.** Rank 2 wants Peasant, rank 3 Villager,
+   rank 4 Burgher, rank 5 Gentry — and those estates want ranks 2, 3, 4 and 5
+   in turn. Neither ladder climbs alone.
+
+A trial is the *last* gate, not a second one: `canAttemptTrial` checks the
+track's XP threshold and faction floor as well as the trial's own
+prerequisites, so the work hall shows exactly one next step. Passing it spends
+the rank's XP and advances the rank in the same action.
+
+**Rank-1 faction floors are 0 by design.** Requiring standing with a faction to
+take its entry rank is circular — nothing a rank-0 player can do moves Crown
+opinion, which made the Court track unreachable. Getting in the door is how you
+*start* earning an institution's regard.
+
+**Known gap:** estate promotion still takes no patron, contrary to §2 above.

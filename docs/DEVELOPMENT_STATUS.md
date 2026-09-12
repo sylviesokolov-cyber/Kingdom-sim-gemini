@@ -4,8 +4,12 @@
 > `[x]` verified · `[~]` partial/foundation · `[ ]` planned. **Nothing else.**
 > Never mark `[x]` without having actually run the check.
 
-**Current phase:** Phase 3 — Simulation core (partial). Phases 0–2 complete.
-**Last updated:** 2026-09-12 (the top HUD's bar is gone — its chips float over the art — and an original gilt icon set replaces lucide across the HUD, dock and Home rail; merged to the base branch at `398708e`, CI and Pages deploy both green)
+**Current phase:** Phase 5 — Career tracks (partial; brought forward). Phases 0–2
+complete, Phase 3 partial.
+**Last updated:** 2026-09-12 (career progression made reachable for the first
+time — rank trials, a shared effect applier, real attributes and throne routes;
+see the change-log entry and `docs/design/GAME_DESIGN_ANALYSIS.md`. Earlier the
+same day: the top HUD's bar is gone — its chips float over the art — and an original gilt icon set replaces lucide across the HUD, dock and Home rail; merged to the base branch at `398708e`, CI and Pages deploy both green)
 
 ---
 
@@ -205,6 +209,57 @@ it against the real population was the only way to know it worked.
 
 ---
 
+## Phase 5 — Career tracks — PARTIAL (brought forward)
+
+Brought forward from its planned position because it was not partial, it was
+**inert**: every rank required a trial quest that no content, engine path or UI
+could complete, so careers were locked at rank 0 and the estate ladder was
+locked at Peasant behind its rank-2 requirement.
+
+- [x] Rank trials: 30 authored trials, six tracks by five ranks
+      (`src/content/progression/trials.ts`), gated on attributes, estate, flags
+      and — from rank 3 up — a named companion's trust. Copper is a fee, never
+      a qualification.
+- [x] `engine/career`: `nextTrial`, `canAttemptTrial`, `completeTrial`,
+      `jobEffect`. Trial resolution lives here rather than in
+      `engine/progression` because `engine/effects` already depends on
+      progression for the XP curve; folding it in would close an import cycle.
+- [x] `engine/effects`: `applyEffect`/`applyEffects`/`canAfford` — the one
+      place the `Effect` vocabulary becomes state. Jobs and trials both go
+      through it; events, quests and bond episodes will.
+- [x] Attributes are real progression. Job attribute rewards were previously
+      dead data (`attributes: { cunning: 0 }`, never applied); every job now
+      trains specific attributes, and training decays with repetition on the
+      same job via the shared `repetitionFactor` curve.
+- [x] Throne routes: the six routes as `Prerequisite` data with per-route
+      progress and blocking reasons (`throneRoutesAvailable`), rendered on the
+      Character sheet so a Hawker can see what a Magnate is for.
+- [x] Work screen: the next rank trial per track, with readable blocking
+      reasons and an Undertake button (`CareerTrackList`, now optionally
+      actionable; the Character sheet keeps it read-only).
+- [x] Two dead ends closed: rank-1 faction floors dropped 10 → 0 (the Court
+      track was unreachable — its rank-1 trial wanted Crown opinion 10 and
+      nothing a rank-0 player could do moved Crown opinion), and entry track
+      work now moves its own faction so the rank-2 floor of 25 is earnable.
+- [ ] Career perks — none exist; `guildMarks` accrue with nothing to buy.
+- [ ] Career shop against Guild Marks.
+- [ ] Per-track job pools at ranks 4–5 are thin (1,600 and 3,400 track XP
+      against two or three authored jobs per track).
+- [ ] Estate promotion still takes no patron, contrary to `PROGRESSION.md` §2.
+
+### Verified by simulated playthrough
+150 in-world days driven through the real engine on each of the six tracks
+(work the best available job until energy runs out, reserving the trial's
+energy; attempt the trial; petition when eligible; advance the day). Every
+track now climbs: merchant and clergy reach rank 4 and Burgher, martial reaches
+rank 3 and Villager, court and scholar reach rank 2 and Villager, shadow
+reaches rank 2 and Villager. Before this change every track sat at rank 0 and
+Peasant forever, on every seed, indefinitely.
+
+**Not playtested by a human.** These are engine probes, not play.
+
+---
+
 ## Known issues
 
 - [ ] **Deep winter is punishing.** A hands-off playthrough sees welfare fall
@@ -214,6 +269,25 @@ it against the real population was the only way to know it worked.
       tools to mitigate it (stockpiling incentives, decrees, Caren's granary
       perks, kingdom investment) land in Phases 4 and 11. Re-tune then, not
       before — tuning it down now would flatten the season.
+- [ ] **Standing is now the progression bottleneck, and it has one source.**
+      With careers reachable, the thing that gates the estate ladder is
+      standing points, which come almost entirely from jobs — and job standing
+      has sharply diminishing returns by design. A merchant probe reached
+      Burgher on day 141 mostly waiting on standing. Standing needs to come
+      from deeds, quests and events, which means the event and story engines
+      are also the progression fix. See `docs/design/GAME_DESIGN_ANALYSIS.md` §2.4.
+- [ ] **No authored narrative events exist.** `EventDefinition`, `EventChoice`,
+      `firedEvents`, `scheduled` and now `applyEffect` are all in place, and
+      `src/content/events/` holds only `LiveEventDefinition` (banner
+      advertising, explicitly not the narrative unit). The world simulates and
+      never interrupts the player to ask a question.
+- [ ] **`driftFactions` conflates faction mood with opinion of the player.** A
+      faction's opinion of the player drifts daily from kingdom state — the
+      Guilds like you more because prosperity is high. `FactionState` should
+      split `mood` (drifts with the world) from `opinion` (moves only through
+      the player's acts), before Phase 8 authors content on the conflation.
+- [ ] `NpcInterior.want` is authored for all fifteen characters and read by
+      nothing. No NPC currently pursues anything of their own.
 - [ ] Council screen is an authored empty state, not a system.
 - [ ] Bond episodes, outfits, intimacy scenes, intimacy gallery and voice are
       all stubs that say so on the Bonds tab's rail (disabled, with a title
@@ -270,6 +344,7 @@ Recorded so no future session relitigates them:
 | 2026-09-12 | `27f2ded` | pass | 81 pass | pass | **green** | Home reverted to a companion-free kingdom dashboard — CI run 34699540794, deploy run 34699540567 |
 | 2026-09-12 | `aaf1ca1` | pass | 87 pass | pass | not run | HUD/dock polish — no run of its own; pushed to the base branch together with `398708e` below |
 | 2026-09-12 | `398708e` | pass | 87 pass | pass | **green** | HUD bar removed + original icon set, fast-forwarded onto the base branch — CI run 34719926595, deploy run 34719926600 |
+| 2026-09-12 | `7a159e4` | pass | 115 pass | pass | pending | Career progression made reachable — rank trials, `applyEffect`, real attributes, throne routes. Browser-verified at 740x360/900x420. CI not yet observed. |
 
 Run `82e5cfd` failed on a missing `@types/node`, fixed in `f7fc550`. Only the
 branch head gets a run when several commits are pushed together, so `f7fc550`
@@ -321,6 +396,54 @@ Driven with Playwright at 900x420 and 740x360, landscape.
 ---
 
 ## Change log
+
+### 2026-09-12 — Career progression made reachable for the first time
+An audit against the source (CLAUDE.md §2.6: code outranks documentation) found
+that the project's self-described most important structural system could not
+run. Every career rank required a trial quest (`trial_<track>_<n>`) referenced
+by id in `CAREER_DEFINITIONS` and authored nowhere, and `advanceCareer` had no
+caller outside the test suite. Confirmed by probe *before* changing anything:
+with infinite copper, maxed track XP and every faction at 100, the only
+remaining blocker was "The rank trial has not been completed."
+
+The cascade that caused: careers locked at rank 0 → Villager blocked behind its
+rank-2 requirement → every estate above Peasant unreachable → Acts 2+
+ungateable and throne routes unreachable.
+
+- **`src/engine/effects/index.ts`** — `applyEffect`, `applyEffects`,
+  `canAfford`. `Effect` is declared in `types/content.ts` as "the single
+  vocabulary for changing state" and nothing applied it generically, so each
+  consumer hand-rolled a partial version and silently dropped the fields it did
+  not use. That is why job attribute rewards were dead data. The work hall now
+  routes through it, and so do trials.
+- **`src/content/progression/trials.ts`** — 30 authored trials. From rank 3 up
+  every trial requires a named companion's trust, which makes "bonds are power"
+  a gate rather than a claim. The estate and career ladders now interlock rung
+  by rung: rank 2 wants Peasant, rank 3 Villager, rank 4 Burgher, rank 5 Gentry.
+- **`src/engine/career/index.ts`** — trial resolution and `jobEffect`.
+- **Attributes are progression.** Every job trains specific attributes, and
+  training decays with repetition via a `repetitionFactor` curve now shared
+  with `standingGain`. A varied life out-trains a ground one.
+- **`throneRoutesAvailable`** and the six routes as `Prerequisite` data, on the
+  Character sheet with per-route progress and reasons.
+- **Balance fixes found by probe, not by reading:** rank-1 faction floors
+  10 → 0 (Court was a hard dead end), and entry track work now moves its own
+  faction so rank 2's floor of 25 is earnable from inside the game.
+- **`docs/design/GAME_DESIGN_ANALYSIS.md`** — market analysis against the
+  kingdom-sim, raising-sim, gacha and relationship-RPG comparables; the
+  progression audit; NPC and event design; and a revised phase ordering that
+  moves the event and story engines ahead of further simulation depth.
+- Verified: `npm run typecheck`, 115 tests (28 new across
+  `tests/effects.test.ts` and `tests/career.test.ts`), `npm run build`. CI not
+  yet observed for this commit.
+- Verified in the browser against the production preview build (Playwright,
+  740x360 and 900x420 landscape): the trial block and the throne-route rows
+  render legibly, no console errors, no horizontal overflow at either size.
+  A trial was taken through the actual UI — merchant rank 0 to 1, 80 track XP
+  spent, the 40-copper float paid and the 95 returned, `merchant.made_the_float`
+  written — and the result survived both a reload and a day advance.
+- **Left undone:** career perks and the Guild Mark shop (marks still buy
+  nothing), patrons for estate promotion, and the thin rank-4/5 job pools.
 
 ### 2026-09-12 — The HUD bar is gone; an original icon set replaces lucide
 Direct correction from the owner on the pass below: they asked for the
