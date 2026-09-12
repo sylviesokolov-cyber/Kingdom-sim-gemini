@@ -5,7 +5,7 @@
 > Never mark `[x]` without having actually run the check.
 
 **Current phase:** Phase 3 — Simulation core (partial). Phases 0–2 complete.
-**Last updated:** 2026-09-12 (HUD name/role no longer disappears at landscape-phone width and now shows an energy readout; new Character tab is a full read-only player sheet — estate ladder, vitals, attributes, all six career tracks, faction standing, and record — see the change-log entry below)
+**Last updated:** 2026-09-12 (the top HUD's bar is gone — its chips float over the art — and an original gilt icon set replaces lucide across the HUD, dock and Home rail; merged to the base branch at `398708e`, CI and Pages deploy both green)
 
 ---
 
@@ -268,6 +268,8 @@ Recorded so no future session relitigates them:
 | 2026-09-12 | `bc7658d` | pass | 81 pass | pass | **green** | Home immersive mode + Bonds hero-screen redesign — CI run 34697125911, deploy run 34697125993 |
 | 2026-09-12 | `e0b0590` | pass | 81 pass | pass | **green** | Recorded verified CI/deploy runs for `bc7658d` — CI run 34697207913, deploy run 34697207885 |
 | 2026-09-12 | `27f2ded` | pass | 81 pass | pass | **green** | Home reverted to a companion-free kingdom dashboard — CI run 34699540794, deploy run 34699540567 |
+| 2026-09-12 | `aaf1ca1` | pass | 87 pass | pass | not run | HUD/dock polish — no run of its own; pushed to the base branch together with `398708e` below |
+| 2026-09-12 | `398708e` | pass | 87 pass | pass | **green** | HUD bar removed + original icon set, fast-forwarded onto the base branch — CI run 34719926595, deploy run 34719926600 |
 
 Run `82e5cfd` failed on a missing `@types/node`, fixed in `f7fc550`. Only the
 branch head gets a run when several commits are pushed together, so `f7fc550`
