@@ -27,6 +27,9 @@ export default function App() {
   const resetGame = useGameStore((s) => s.resetGame);
 
   const [showSettings, setShowSettings] = useState(false);
+  const [hideUI, setHideUI] = useState(false);
+  const isHome = screen === 'home';
+  const uiHidden = isHome && hideUI;
 
   const alerts = useMemo(
     () => ({
@@ -47,9 +50,11 @@ export default function App() {
           <p>Valenreach is played in landscape. Rotate to enter the kingdom.</p>
         </div>
 
-        <HeaderHud game={game} onOpenSettings={() => setShowSettings(true)} />
+        {!uiHidden && <HeaderHud game={game} onOpenSettings={() => setShowSettings(true)} />}
 
-        {screen === 'home' && <HomeScreen />}
+        {screen === 'home' && (
+          <HomeScreen hideUI={hideUI} onToggleHideUI={() => setHideUI((v) => !v)} />
+        )}
         {screen === 'kingdom' && <KingdomScreen />}
         {screen === 'characters' && <CharactersScreen />}
         {screen === 'work' && <WorkScreen />}
@@ -71,7 +76,9 @@ export default function App() {
 
         {screen !== 'home' && <div className="dock-spacer" />}
 
-        <Dock screen={screen} onNavigate={setScreen} onAdvanceDay={advanceDay} alerts={alerts} />
+        {!uiHidden && (
+          <Dock screen={screen} onNavigate={setScreen} onAdvanceDay={advanceDay} alerts={alerts} />
+        )}
 
         <div className="toast-stack">
           {toasts.map((t) => (

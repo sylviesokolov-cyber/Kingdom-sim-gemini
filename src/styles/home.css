@@ -135,6 +135,87 @@
 }
 
 /* ------------------------------------------------------------------ *
+ * Hide-UI toggle — always visible, even with everything else hidden,
+ * so the player can bring the interface back.
+ * ------------------------------------------------------------------ */
+
+.home-hide-toggle {
+  position: absolute;
+  right: 10px;
+  top: 58px;
+  z-index: 25;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: rgba(18, 8, 16, 0.55);
+  border: 1px solid rgba(201, 162, 39, 0.22);
+  color: var(--parchment);
+  opacity: 0.75;
+  transition: all var(--dur) var(--ease);
+}
+
+.home-hide-toggle:hover {
+  opacity: 1;
+  border-color: rgba(201, 162, 39, 0.6);
+  color: var(--gold-200);
+}
+
+/* ------------------------------------------------------------------ *
+ * Right-side info panel — a small, translucent readout of what needs
+ * attention today. Kept short and low-contrast on purpose: it should
+ * read at a glance without competing with the background art.
+ * ------------------------------------------------------------------ */
+
+.home-panel {
+  position: absolute;
+  right: 10px;
+  top: 98px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 168px;
+  padding: 8px;
+  border-radius: 11px;
+  background: rgba(18, 8, 16, 0.5);
+  border: 1px solid rgba(201, 162, 39, 0.2);
+  backdrop-filter: blur(6px);
+}
+
+.home-panel-head {
+  font-family: var(--font-ui);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 2px 2px;
+}
+
+.home-panel-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px;
+  border-radius: 7px;
+  text-align: left;
+  color: var(--parchment);
+  transition: all var(--dur) var(--ease);
+}
+
+.home-panel-row:hover {
+  background: rgba(201, 162, 39, 0.12);
+  color: var(--gold-200);
+}
+
+.home-panel-row span {
+  font-size: 10.5px;
+  line-height: 1.25;
+}
+
+/* ------------------------------------------------------------------ *
  * The Events sheet, opened from the rail — text/tag rows only.
  * ------------------------------------------------------------------ */
 
@@ -289,6 +370,28 @@
     bottom: 60px;
     padding: 8px 12px;
     width: min(420px, calc(100% - 82px));
+  }
+
+  .home-hide-toggle {
+    top: 50px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .home-panel {
+    top: 84px;
+    width: 148px;
+    padding: 6px;
+  }
+
+  .home-panel-row span {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 720px) {
+  .home-panel {
+    width: 130px;
   }
 }
 
