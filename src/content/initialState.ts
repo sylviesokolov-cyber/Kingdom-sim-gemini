@@ -52,7 +52,9 @@ export function createInitialPlayer(name = 'Syl'): PlayerState {
     xpToNext: 100,
     attributes: { might: 8, cunning: 10, authority: 6, piety: 7, charm: 9 },
     vitals: { energy: 80, maxEnergy: 80, health: 82, hunger: 30 },
-    currencies: { copper: 45, guildMarks: 0, fateCrystals: 1600, bondHearts: 0 },
+    // Enough for one ten-pull on day one: a player must be able to meet the
+    // summon system before they are asked to save for it.
+    currencies: { copper: 45, guildMarks: 0, fateCrystals: 3200, bondHearts: 0 },
     inventory: { water: 2, bread: 1 },
     careers: createCareers(),
     standing: createStanding(),

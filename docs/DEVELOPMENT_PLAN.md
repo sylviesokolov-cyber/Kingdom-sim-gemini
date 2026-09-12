@@ -31,7 +31,7 @@
 ---
 
 ## Phase 1 — Foundation
-**Status: ACTIVE**
+**Status: COMPLETE**
 
 The spine. Nothing else is safe to build until this is right.
 
@@ -49,7 +49,7 @@ test, and the shell renders correctly at 740×360.
 ---
 
 ## Phase 2 — Vertical slice
-**Status: ACTIVE**
+**Status: COMPLETE**
 
 One complete loop, end to end, proving the spine carries real gameplay.
 
@@ -66,6 +66,8 @@ One complete loop, end to end, proving the spine carries real gameplay.
 ---
 
 ## Phase 3 — Simulation core
+**Status: PARTIAL** — most stages landed with the foundation; see the status tracker.
+
 Fill in every pipeline stage for real.
 
 - Production chains (grain→bread, herbs→medicine, ore→tools→arms)

@@ -1,0 +1,70 @@
+/**
+ * The only place colors are defined. If a component needs a color that is not
+ * here, add a token — never hardcode a hex value in a component.
+ * See docs/UI_DESIGN_SYSTEM.md.
+ */
+
+:root {
+  /* Grounds */
+  --ink-950: #0a0509;
+  --ink-900: #120810;
+  --plum-900: #1c0d1a;
+  --plum-800: #2a1426;
+  --plum-700: #3a1c33;
+
+  /* Jewel */
+  --wine-800: #4a1226;
+  --wine-600: #7d1f38;
+
+  /* Gold */
+  --gold-600: #a8851f;
+  --gold-500: #c9a227;
+  --gold-400: #e3c15a;
+  --gold-200: #f2e0a8;
+
+  /* Text */
+  --ivory: #f6efe2;
+  --parchment: #d9cbb0;
+  --muted: #9d8d7c;
+
+  /* Relationship — rose is reserved for affection and bonds. */
+  --rose-500: #e05780;
+  --rose-300: #f4a6bf;
+
+  /* Semantic */
+  --jade-500: #4f9d69;
+  --ember-500: #d9762b;
+  --blood-500: #b33a3a;
+
+  /* Rarity */
+  --ssr: #e3c15a;
+  --ssr-glow: rgba(227, 193, 90, 0.45);
+  --sr: #a882e0;
+  --sr-glow: rgba(168, 130, 224, 0.4);
+  --r: #7f93a8;
+  --n: #8a8175;
+
+  /* Materials */
+  --panel: linear-gradient(160deg, rgba(42, 20, 38, 0.92), rgba(18, 8, 16, 0.96));
+  --panel-solid: linear-gradient(160deg, rgba(42, 20, 38, 0.99), rgba(18, 8, 16, 1));
+  --panel-border: 1px solid rgba(201, 162, 39, 0.35);
+  --panel-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(242, 224, 168, 0.12);
+  --panel-radius: 14px;
+
+  --primary-bg: linear-gradient(165deg, var(--wine-600), var(--wine-800));
+  --gold-bg: linear-gradient(165deg, var(--gold-400), var(--gold-600));
+
+  /* Type */
+  --font-display: 'Cinzel', 'Times New Roman', serif;
+  --font-body: 'Cormorant Garamond', Georgia, serif;
+  --font-ui: 'Cinzel', system-ui, sans-serif;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --dur: 200ms;
+
+  color-scheme: dark;
+}
+
+/* The page commits to a single dark look; there is no light variant. */

@@ -1,0 +1,736 @@
+/**
+ * The Home / Throne screen.
+ * Target layout: docs/reference/02-home-screen-mockup.png
+ *
+ * Rules that must hold at every supported width:
+ *   - the companion's face is never covered by a panel
+ *   - the dialogue box sits in the lower third, clear of her head
+ *   - Next Day is always reachable by the right thumb
+ */
+
+.home {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.home-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center 22%;
+  /* The plates we have are character art, not scenery. Blurring them turns a
+     competing figure into depth behind the companion. */
+  transform: scale(1.12);
+  filter: saturate(0.85) brightness(0.62) blur(6px);
+}
+
+.home-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 55% at 45% 42%, transparent 40%, rgba(10, 5, 9, 0.55) 100%),
+    linear-gradient(180deg, rgba(10, 5, 9, 0.82) 0%, transparent 22%, transparent 52%, rgba(10, 5, 9, 0.9) 100%),
+    linear-gradient(90deg, rgba(10, 5, 9, 0.72) 0%, transparent 26%, transparent 56%, rgba(10, 5, 9, 0.86) 100%);
+}
+
+/* ------------------------------------------------------------------ *
+ * Left utility rail
+ * ------------------------------------------------------------------ */
+
+.side-rail {
+  position: absolute;
+  left: 10px;
+  top: 78px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rail-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 48px;
+  padding: 7px 4px;
+  border-radius: 11px;
+  background: rgba(18, 8, 16, 0.62);
+  border: 1px solid rgba(201, 162, 39, 0.24);
+  color: var(--parchment);
+  transition: all var(--dur) var(--ease);
+}
+
+.rail-btn:hover {
+  border-color: rgba(201, 162, 39, 0.6);
+  color: var(--gold-200);
+}
+
+.rail-btn span {
+  font-family: var(--font-ui);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rail-dot {
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--blood-500);
+  box-shadow: 0 0 8px rgba(179, 58, 58, 0.9);
+}
+
+/* ------------------------------------------------------------------ *
+ * Character stage
+ * ------------------------------------------------------------------ */
+
+.stage {
+  position: absolute;
+  left: 50%;
+  top: 48px;
+  bottom: 0;
+  transform: translateX(-46%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.stage-art {
+  /* The source plates are square, with the figure occupying roughly the
+     middle 59% of the canvas. Overscaling brings her up to stage height. */
+  height: 172%;
+  width: auto;
+  max-width: none;
+  object-fit: contain;
+  object-position: center;
+  transform: translateY(-1%);
+  filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.8));
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 300ms var(--ease);
+  animation: stage-enter 420ms var(--ease);
+}
+
+.stage-art:active {
+  transform: scale(0.995);
+}
+
+@keyframes stage-enter {
+  from {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+}
+
+.location-label {
+  position: absolute;
+  top: 62px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 15;
+  font-family: var(--font-ui);
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(242, 224, 168, 0.72);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ *
+ * Dialogue box — lower third, clear of her head
+ * ------------------------------------------------------------------ */
+
+.home-stack {
+  position: absolute;
+  left: 56px;
+  bottom: 74px;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: min(440px, 45%);
+  max-height: calc(100% - 140px);
+}
+
+.home-stack-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  min-height: 0;
+}
+
+.dialogue {
+  width: 100%;
+  padding: 11px 15px 13px;
+  background: linear-gradient(150deg, rgba(18, 8, 16, 0.93), rgba(10, 5, 9, 0.88));
+  border: 1px solid rgba(201, 162, 39, 0.32);
+  border-radius: 12px;
+  box-shadow: 0 14px 34px -12px rgba(0, 0, 0, 0.9);
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease);
+}
+
+.dialogue:hover {
+  border-color: rgba(201, 162, 39, 0.6);
+}
+
+.dialogue-name {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--gold-200);
+  margin-bottom: 4px;
+}
+
+.dialogue-mood {
+  font-family: var(--font-ui);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.dialogue p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--ivory);
+  font-style: italic;
+}
+
+/* ------------------------------------------------------------------ *
+ * Banner and matters cards
+ * ------------------------------------------------------------------ */
+
+.banner-card {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 172px;
+  flex-shrink: 0;
+  padding: 7px;
+  border-radius: 11px;
+  background: linear-gradient(150deg, rgba(74, 18, 38, 0.9), rgba(18, 8, 16, 0.92));
+  border: 1px solid rgba(227, 193, 90, 0.42);
+  box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.9);
+  text-align: left;
+  transition: filter var(--dur) var(--ease);
+}
+
+.banner-card:hover {
+  filter: brightness(1.15);
+}
+
+.banner-card-art {
+  position: relative;
+  width: 40px;
+  height: 46px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 7px;
+  border: 1px solid rgba(227, 193, 90, 0.4);
+}
+
+.banner-card-art img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 250%;
+  height: auto;
+  max-width: none;
+  transform: translate(-50%, -34%);
+}
+
+.banner-card b {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--gold-200);
+  line-height: 1.2;
+}
+
+.banner-card small {
+  display: inline-block;
+  margin-top: 3px;
+  font-family: var(--font-ui);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(224, 87, 128, 0.25);
+  color: var(--rose-300);
+}
+
+.banner-card em {
+  display: block;
+  margin-top: 3px;
+  font-size: 9px;
+  font-style: normal;
+  color: var(--muted);
+}
+
+.matters {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 11px;
+  border-radius: 11px;
+  background: linear-gradient(150deg, rgba(28, 13, 26, 0.92), rgba(10, 5, 9, 0.9));
+  border: 1px solid rgba(201, 162, 39, 0.28);
+  box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.9);
+}
+
+.matters-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--gold-200);
+  margin-bottom: 5px;
+}
+
+.matter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  font-size: 13px;
+  color: var(--parchment);
+  padding: 2px 0;
+  transition: color var(--dur) var(--ease);
+}
+
+.matter:hover {
+  color: var(--gold-200);
+}
+
+.matter-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--gold-500);
+  flex-shrink: 0;
+}
+
+.matter.bad .matter-dot {
+  background: var(--blood-500);
+}
+
+.matter.good .matter-dot {
+  background: var(--jade-500);
+}
+
+/* ------------------------------------------------------------------ *
+ * Companion panel — the right column
+ * ------------------------------------------------------------------ */
+
+.companion {
+  position: absolute;
+  right: 10px;
+  top: 60px;
+  bottom: 78px;
+  z-index: 30;
+  width: min(310px, 33%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  background: var(--panel);
+  border: var(--panel-border);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--panel-shadow);
+  backdrop-filter: blur(12px);
+}
+
+.companion::-webkit-scrollbar {
+  display: none;
+}
+
+.companion-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.companion-portrait {
+  position: relative;
+  width: 52px;
+  height: 60px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid;
+}
+
+.companion-portrait img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 250%;
+  height: auto;
+  max-width: none;
+  transform: translate(-50%, -34%);
+}
+
+.companion-id {
+  min-width: 0;
+  flex: 1;
+}
+
+.companion-id h2 {
+  font-size: 19px;
+  color: var(--gold-200);
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.companion-id p {
+  margin: 1px 0 0;
+  font-size: 13px;
+  color: var(--parchment);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.affection-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.affection-heart {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--rose-500);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.affection-row .bar {
+  flex: 1;
+}
+
+.affection-row small {
+  font-family: var(--font-ui);
+  font-size: 9px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.trait-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.companion-quote {
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.35;
+  color: var(--parchment);
+  padding: 7px 9px;
+  border-left: 2px solid rgba(224, 87, 128, 0.5);
+  background: rgba(10, 5, 9, 0.42);
+  border-radius: 0 7px 7px 0;
+}
+
+.companion-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.companion-links {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+}
+
+.link-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 7px;
+  border-radius: 7px;
+  font-family: var(--font-ui);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--parchment);
+  background: rgba(10, 5, 9, 0.42);
+  border: 1px solid rgba(201, 162, 39, 0.18);
+  transition: all var(--dur) var(--ease);
+}
+
+.link-btn:hover {
+  border-color: rgba(201, 162, 39, 0.5);
+  color: var(--gold-200);
+}
+
+.retinue-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 2px;
+}
+
+.retinue-strip {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.retinue-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(201, 162, 39, 0.28);
+  flex-shrink: 0;
+  transition: all var(--dur) var(--ease);
+  position: relative;
+}
+
+.retinue-avatar img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 250%;
+  height: auto;
+  max-width: none;
+  transform: translate(-50%, -32%);
+}
+
+.retinue-avatar.selected {
+  border-color: var(--gold-400);
+  box-shadow: 0 0 12px -2px var(--ssr-glow);
+}
+
+.retinue-avatar.ill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(179, 58, 58, 0.32);
+}
+
+/* ------------------------------------------------------------------ *
+ * Bottom dock
+ * ------------------------------------------------------------------ */
+
+.dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  background: linear-gradient(0deg, rgba(10, 5, 9, 0.97), rgba(10, 5, 9, 0.72));
+  border-top: 1px solid rgba(201, 162, 39, 0.28);
+}
+
+.dock-tabs {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.dock-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.dock-tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 58px;
+  height: 52px;
+  padding: 0 4px;
+  border-radius: 10px;
+  color: var(--muted);
+  border: 1px solid transparent;
+  transition: all var(--dur) var(--ease);
+  flex-shrink: 0;
+}
+
+.dock-tab span {
+  font-family: var(--font-ui);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dock-tab:hover {
+  color: var(--parchment);
+}
+
+.dock-tab.selected {
+  color: var(--gold-200);
+  background: linear-gradient(180deg, rgba(74, 18, 38, 0.7), rgba(28, 13, 26, 0.5));
+  border-color: rgba(201, 162, 39, 0.42);
+}
+
+.dock-tab .rail-dot {
+  top: 6px;
+  right: 10px;
+  width: 6px;
+  height: 6px;
+}
+
+.next-day {
+  flex-shrink: 0;
+}
+
+/* ------------------------------------------------------------------ *
+ * Narrow landscape phones
+ * ------------------------------------------------------------------ */
+
+@media (max-height: 430px) {
+  .dock {
+    height: 54px;
+  }
+
+  .dock-tab {
+    min-width: 48px;
+    height: 44px;
+  }
+
+  .side-rail {
+    top: 56px;
+    gap: 7px;
+  }
+
+  .rail-btn {
+    width: 40px;
+    padding: 5px 3px;
+  }
+
+  .location-label {
+    top: 50px;
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 860px) {
+  .companion {
+    width: 248px;
+    top: 54px;
+    bottom: 72px;
+    padding: 8px;
+    gap: 5px;
+  }
+
+  .companion-id h2 {
+    font-size: 16px;
+  }
+
+  .companion-portrait {
+    width: 42px;
+    height: 50px;
+  }
+
+  .companion-quote {
+    display: none;
+  }
+
+  .home-stack {
+    left: 50px;
+    bottom: 64px;
+    width: min(400px, 52%);
+    gap: 6px;
+  }
+
+  .dialogue {
+    padding: 7px 11px 9px;
+  }
+
+  .dialogue p {
+    font-size: 13px;
+  }
+
+  .banner-card {
+    width: 136px;
+  }
+
+  .matter {
+    font-size: 11px;
+  }
+
+  .dock {
+    height: 58px;
+  }
+
+  .dock-tab {
+    min-width: 50px;
+    height: 46px;
+  }
+
+  .stage {
+    transform: translateX(-62%);
+  }
+}
+
+/* Very short landscape: drop the banner rather than stacking three cards. */
+@media (max-height: 430px) {
+  .banner-card {
+    display: none;
+  }
+
+  .companion-quote {
+    display: none;
+  }
+
+  .companion {
+    top: 48px;
+    bottom: 58px;
+    gap: 4px;
+    padding: 8px;
+  }
+
+  .companion-links {
+    display: none;
+  }
+
+  .retinue-avatar {
+    width: 32px;
+    height: 32px;
+  }
+
+  .home-stack {
+    max-height: calc(100% - 120px);
+  }
+}
