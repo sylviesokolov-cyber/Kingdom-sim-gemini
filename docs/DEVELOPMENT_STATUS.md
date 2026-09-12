@@ -346,6 +346,7 @@ Recorded so no future session relitigates them:
 | 2026-09-12 | `398708e` | pass | 87 pass | pass | **green** | HUD bar removed + original icon set, fast-forwarded onto the base branch — CI run 34719926595, deploy run 34719926600 |
 | 2026-09-12 | `7a159e4` | pass | 115 pass | pass | **green** | Career progression made reachable — rank trials, `applyEffect`, real attributes, throne routes. Browser-verified at 740x360/900x420. CI run 34722170630 |
 | 2026-09-12 | `ed665b9` | pass | 115 pass | pass | **green** | Design analysis + doc updates — CI run 34722625325. (The job-level API reported its Test step in progress for several minutes after the run had in fact completed; the run-level status is the reliable one.) |
+| 2026-09-12 | `2fc95c3` | pass | 115 pass | pass | **green** | Merged `claude/kingdom-simulator-progression-a9i7uk` into the default branch `claude/kingdom-simulator-bonding-0288cn` as a clean fast-forward (0 commits behind, no conflict). Re-verified locally after the merge before pushing; CI run 34723724967 and Pages deploy run 34723725024 both green on the merged commit. |
 
 Run `82e5cfd` failed on a missing `@types/node`, fixed in `f7fc550`. Only the
 branch head gets a run when several commits are pushed together, so `f7fc550`
@@ -397,6 +398,16 @@ Driven with Playwright at 900x420 and 740x360, landscape.
 ---
 
 ## Change log
+
+### 2026-09-12 — Progression branch merged to the default branch
+`claude/kingdom-simulator-progression-a9i7uk` merged into
+`claude/kingdom-simulator-bonding-0288cn` (this repo's default branch) as a
+clean fast-forward — the progression branch was 4 commits ahead with 0 commits
+behind, so there was nothing to reconcile. Re-ran `npm run verify` locally
+against the merged tree before pushing (typecheck, 115 tests, build all pass),
+then confirmed CI (run 34723724967) and the Pages deploy (run 34723725024)
+both green on the merged commit `2fc95c3`. Everything in the entry below is
+now live on the default branch.
 
 ### 2026-09-12 — Career progression made reachable for the first time
 An audit against the source (CLAUDE.md §2.6: code outranks documentation) found
