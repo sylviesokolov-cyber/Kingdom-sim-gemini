@@ -5,7 +5,7 @@
 > Never mark `[x]` without having actually run the check.
 
 **Current phase:** Phase 3 — Simulation core (partial). Phases 0–2 complete.
-**Last updated:** 2026-09-12 (Home: HUD now shows the player's current role, a small right-side "Today" panel surfaces live events/companion/market/unrest attention items, and a hide-UI toggle drops all Home chrome to show the backdrop alone — see the change-log entry below)
+**Last updated:** 2026-09-12 (HUD name/role no longer disappears at landscape-phone width and now shows an energy readout; new Character tab is a full read-only player sheet — estate ladder, vitals, attributes, all six career tracks, faction standing, and record — see the change-log entry below)
 
 ---
 
@@ -73,6 +73,15 @@
       to see the *kingdom* backdrop the owner asked to keep as the screen's
       main focus, and a background selector (single image or carousel) is
       expected to land here next.
+- [x] Character tab (`ProfileScreen.tsx`, `ScreenId: 'profile'`): a
+      read-only player sheet — the full estate ladder with the current step
+      highlighted, vitals (energy/health/hunger), the five attributes,
+      currencies, all six career tracks (via the `CareerTrackList` component
+      shared with the Work screen), personal standing with each of the
+      eight factions, and a record panel (deeds/perks/businesses/bounty
+      counts plus active perk tags). Deliberately read-only — petitioning an
+      estate and taking career jobs stay on the Work screen; this tab exists
+      to see the whole character at once, not to duplicate its actions.
 - [x] Bonds tab (Characters screen): a full-bleed hero screen — the
       companion's art fills the stage with Talk/Gift/Bond, the tier/affection
       readout, and traits overlaid directly on it, plus a right-side rail
@@ -310,6 +319,37 @@ Driven with Playwright at 900x420 and 740x360, landscape.
 ---
 
 ## Change log
+
+### 2026-09-12 — HUD fixes and a new Character sheet tab
+Owner feedback on the previous entry's screenshot, taken at landscape-phone
+width: the HUD's name/role was invisible (a pre-existing `display: none`
+below 860px that the previous entry's role text inherited rather than
+fixed), no energy stat was visible anywhere, and the owner asked for a
+dedicated character/stats tab alongside Kingdom/Bonds/Work.
+
+- **Fixed the HUD name/role disappearing on narrow screens**
+  (`panels.css`): `.hud-player-id` no longer gets `display: none` below
+  860px. Instead it shrinks (`max-width` steps down at 860px and again at
+  640px, `.hud-progress` bar and the "Lv." suffix hide, font sizes drop) so
+  the name and role stay readable at 740×360 instead of vanishing.
+- **Energy in the HUD** (`HeaderHud.tsx`): a new chip in the currency row
+  reading `energy/maxEnergy` with a lightning icon, matching how gold/guild
+  marks/crystals/hearts already read. This is the same `player.vitals`
+  energy that job costs are checked against on the Work screen — no new
+  state, just a place to see it without opening a screen.
+- **New Character tab** (`ProfileScreen.tsx`, `ScreenId: 'profile'`,
+  between Home and Kingdom in the dock): the full read-only player sheet
+  described in Phase 2 above. Extracted the career-track rank/XP-bar list
+  out of `WorkScreen.tsx` into a shared `CareerTrackList` component so the
+  new tab and Work render the identical list from one place instead of two
+  copies of the same JSX.
+- Verified: `npm run typecheck`, all 87 tests, and `npm run build` pass.
+  Checked at 740×360 and 1200×560 landscape via Playwright against the
+  production preview build — the HUD name/role and energy chip are visible
+  at both sizes, the Character tab's two columns render and scroll
+  correctly (estate ladder, vitals, attributes, coffers on the left;
+  career tracks, faction standing, and record on the right), and the Work
+  screen's career-track panel still renders correctly after the extraction.
 
 ### 2026-09-12 — Home: role in the HUD, a "Today" info panel, hide-UI toggle
 Small follow-up polish pass on the current spare, image-first Home (the one

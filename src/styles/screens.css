@@ -169,6 +169,51 @@
 }
 
 /* ------------------------------------------------------------------ *
+ * Estate ladder — the Character sheet's progression stepper
+ * ------------------------------------------------------------------ */
+
+.estate-ladder {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+.estate-step {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.estate-step-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(157, 141, 124, 0.35);
+  flex-shrink: 0;
+}
+
+.estate-step.passed {
+  color: var(--parchment);
+}
+
+.estate-step.passed .estate-step-dot {
+  background: var(--jade-500);
+}
+
+.estate-step.current {
+  color: var(--gold-200);
+}
+
+.estate-step.current .estate-step-dot {
+  background: var(--gold-400);
+  box-shadow: 0 0 6px var(--gold-400);
+}
+
+/* ------------------------------------------------------------------ *
  * Stat grid — kingdom vitals
  * ------------------------------------------------------------------ */
 

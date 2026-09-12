@@ -8,11 +8,13 @@ import {
   ShoppingBag,
   Sunrise,
   Swords,
+  User,
 } from 'lucide-react';
 import type { ScreenId } from '../../state/store';
 
 const TABS: { id: ScreenId; label: string; Icon: typeof Castle }[] = [
   { id: 'home', label: 'Home', Icon: Castle },
+  { id: 'profile', label: 'Character', Icon: User },
   { id: 'kingdom', label: 'Kingdom', Icon: Map },
   { id: 'characters', label: 'Bonds', Icon: HeartHandshake },
   { id: 'work', label: 'Work', Icon: Swords },

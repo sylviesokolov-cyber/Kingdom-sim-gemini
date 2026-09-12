@@ -3,6 +3,7 @@ import { useGameStore } from './state/store';
 import { HeaderHud } from './components/layout/HeaderHud';
 import { Dock } from './components/layout/Dock';
 import { HomeScreen } from './components/screens/HomeScreen';
+import { ProfileScreen } from './components/screens/ProfileScreen';
 import { KingdomScreen } from './components/screens/KingdomScreen';
 import { CharactersScreen } from './components/screens/CharactersScreen';
 import { WorkScreen } from './components/screens/WorkScreen';
@@ -55,6 +56,7 @@ export default function App() {
         {screen === 'home' && (
           <HomeScreen hideUI={hideUI} onToggleHideUI={() => setHideUI((v) => !v)} />
         )}
+        {screen === 'profile' && <ProfileScreen />}
         {screen === 'kingdom' && <KingdomScreen />}
         {screen === 'characters' && <CharactersScreen />}
         {screen === 'work' && <WorkScreen />}
