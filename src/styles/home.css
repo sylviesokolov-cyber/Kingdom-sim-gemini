@@ -1,38 +1,26 @@
 /**
  * The Home screen.
  *
- * Home is the throne room — the kingdom simulator's command center, not a
- * companion showcase. It carries no character art or portraits: a glance at
- * the kingdom's vitals, a link into whatever event campaign is live, then
- * the day's actions, each linking straight into the screen that handles it
- * (Work, the Bourse, Council, Summon, and yes, the Bonds tab — bonding is
- * real but stays a side system, reached the same way as everything else
- * here). See docs/UI_DESIGN_SYSTEM.md.
+ * Kept deliberately spare on the owner's direct instruction: a full-bleed
+ * painted backdrop (from public/backgrounds/), the shared utility rail, and
+ * one card naming the single thing that matters today. The HUD and dock are
+ * rendered by the app shell, not here. No kingdom-vitals grid, no
+ * multi-row action list, no event ticker — those all read as clutter once
+ * there is real art behind them; Events stays reachable through the rail's
+ * modal sheet instead of living on the screen permanently.
  *
- * This has been rebuilt this way twice now after a companion-display version
- * was tried and reverted both times — see docs/DEVELOPMENT_STATUS.md. Do not
- * put character art back on this screen.
+ * `.scene-bg` / `.scene-vignette` are shared with the Bonds tab and defined
+ * once in screens.css.
  *
  * Rules that must hold at every supported width:
  *   - Next Day is always reachable by the right thumb
+ *   - the quest card never collides with the dock or the rail
  */
 
 .home {
   position: absolute;
   inset: 0;
   overflow: hidden;
-}
-
-/* Ambient royal glow — no photographic backdrop, just the material language
-   (dark royal ground, gold/wine accents) the rest of the app already uses. */
-.home::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 70% 55% at 50% -8%, rgba(125, 31, 56, 0.3), transparent 60%),
-    radial-gradient(ellipse 55% 50% at 100% 100%, rgba(201, 162, 39, 0.1), transparent 60%);
-  pointer-events: none;
 }
 
 /* ------------------------------------------------------------------ *
@@ -88,60 +76,39 @@
 }
 
 /* ------------------------------------------------------------------ *
- * Main column — kingdom vitals, the event ticker, then the day's actions
+ * The quest card — the one thing on Home that isn't chrome or art.
+ * A single line naming the player's next step toward their next estate.
  * ------------------------------------------------------------------ */
 
-.home-main {
+.home-quest {
   position: absolute;
-  left: 78px;
-  right: 14px;
-  top: 58px;
-  bottom: 14px;
+  /* Clears the utility rail (left:10, width up to 48) horizontally at every
+     supported size, so it never needs its own narrow-width override. */
+  left: 68px;
+  /* Clears the dock (62px tall) — see the narrow-height override below,
+     where the dock itself shrinks to 54px. */
+  bottom: 76px;
   z-index: 20;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-height: 0;
-}
-
-.home-head {
-  flex-shrink: 0;
-}
-
-.home-head h2 {
-  font-size: 19px;
-  color: var(--gold-200);
-  margin-top: 2px;
-}
-
-.home-vitals {
-  flex-shrink: 0;
-  grid-template-columns: repeat(4, 1fr);
-}
-
-/* The live-event banner — text and a tag only, never a character thumbnail.
-   Reuses the .row treatment so it sits in the same visual family as Today's
-   Matters below it. */
-.event-ticker {
-  flex-shrink: 0;
-  display: flex;
   align-items: center;
-  gap: 9px;
-  width: 100%;
-  padding: 8px 10px;
-  border-radius: 10px;
+  gap: 10px;
+  width: min(420px, calc(100% - 82px));
+  padding: 10px 14px;
+  border-radius: 12px;
   text-align: left;
   color: var(--gold-400);
-  background: linear-gradient(100deg, rgba(74, 18, 38, 0.55), rgba(28, 13, 26, 0.5));
-  border: 1px solid rgba(201, 162, 39, 0.3);
+  background: linear-gradient(160deg, rgba(42, 20, 38, 0.88), rgba(18, 8, 16, 0.92));
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(242, 224, 168, 0.12);
+  backdrop-filter: blur(10px);
   transition: all var(--dur) var(--ease);
 }
 
-.event-ticker:hover {
+.home-quest:hover {
   border-color: var(--gold-400);
 }
 
-.event-ticker-body {
+.home-quest-body {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -149,31 +116,27 @@
   gap: 2px;
 }
 
-.event-ticker-name {
+.home-quest-eyebrow {
+  font-family: var(--font-ui);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--parchment);
+}
+
+.home-quest-text {
   font-family: var(--font-display);
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--gold-200);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.event-ticker-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-family: var(--font-ui);
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  color: var(--parchment);
-}
-
-.event-ticker-dots {
-  display: flex;
-  gap: 5px;
-  flex-shrink: 0;
-}
+/* ------------------------------------------------------------------ *
+ * The Events sheet, opened from the rail — text/tag rows only.
+ * ------------------------------------------------------------------ */
 
 .event-tag {
   display: inline-block;
@@ -211,21 +174,6 @@
   vertical-align: middle;
 }
 
-.event-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgba(246, 239, 226, 0.3);
-  cursor: pointer;
-  transition: all var(--dur) var(--ease);
-}
-
-.event-dot.selected {
-  background: var(--gold-400);
-  box-shadow: 0 0 8px -1px var(--ssr-glow);
-}
-
 .home-events-sheet {
   padding: 16px;
   max-width: 440px;
@@ -234,11 +182,6 @@
 .home-events-sheet h3 {
   color: var(--gold-200);
   margin: 0 0 8px;
-}
-
-.home-actions-list {
-  flex: 1;
-  min-height: 0;
 }
 
 /* ------------------------------------------------------------------ *
@@ -342,35 +285,14 @@
     padding: 5px 3px;
   }
 
-  .home-main {
-    top: 50px;
-    bottom: 10px;
-    gap: 6px;
-  }
-
-  .home-head h2 {
-    font-size: 16px;
-  }
-
-  .event-ticker {
-    padding: 6px 9px;
+  .home-quest {
+    bottom: 60px;
+    padding: 8px 12px;
+    width: min(420px, calc(100% - 82px));
   }
 }
 
 @media (max-width: 860px) {
-  .home-main {
-    left: 68px;
-    top: 54px;
-  }
-
-  .home-head h2 {
-    font-size: 16px;
-  }
-
-  .home-vitals {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .dock {
     height: 58px;
   }
