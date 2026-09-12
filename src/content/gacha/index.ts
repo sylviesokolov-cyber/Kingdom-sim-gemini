@@ -45,7 +45,7 @@ export const BANNERS: BannerDefinition[] = [
     featuredSrIds: ['rin', 'claire'],
     costPerPull: 300,
     costPerTen: 3000,
-    artUrl: '/characters/rubia_assassin.png',
+    artUrl: 'characters/rubia_assassin.png',
     pool: [...companionEntries(), ...CHARTERS, ...GIFTS, ...SUNDRIES],
   },
   {
@@ -55,7 +55,7 @@ export const BANNERS: BannerDefinition[] = [
     description: 'The permanent roster. Everyone who can be called, can be called here.',
     costPerPull: 300,
     costPerTen: 3000,
-    artUrl: '/characters/vesper_eclipse.png',
+    artUrl: 'characters/vesper_eclipse.png',
     pool: [...companionEntries(), ...CHARTERS, ...GIFTS, ...SUNDRIES],
   },
   {
@@ -65,7 +65,7 @@ export const BANNERS: BannerDefinition[] = [
     description: 'Gifts, keepsakes, and the occasional friend. Cheap, and generous about it.',
     costPerPull: 60,
     costPerTen: 600,
-    artUrl: '/characters/elena_scheherazade.png',
+    artUrl: 'characters/elena_scheherazade.png',
     pool: [
       ...companionEntries().filter((e) => e.rarity !== 'SSR'),
       ...GIFTS,

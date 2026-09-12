@@ -26,7 +26,7 @@ export function WorkScreen() {
     <ScreenFrame
       title="The Work Hall"
       subtitle="What you do with a day is what you become."
-      background="/characters/backgrounds/blacksmith_background.webp"
+      background="characters/backgrounds/blacksmith_background.webp"
     >
       <div className="screen-cols cols-2-narrow">
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, gap: 8 }}>

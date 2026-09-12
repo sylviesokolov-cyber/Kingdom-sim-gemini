@@ -21,7 +21,7 @@ import { RESOURCES } from '../../content/resources';
 import { bondTier, deriveMood, selectDialogue } from '../../engine/relationships';
 import { CharacterArt } from '../ui/CharacterArt';
 
-const FALLBACK_BG = '/characters/backgrounds/main_screen_background.jpg';
+const FALLBACK_BG = 'characters/backgrounds/main_screen_background.jpg';
 
 export function HomeScreen() {
   const game = useGameStore((s) => s.game);

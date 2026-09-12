@@ -30,7 +30,7 @@ export function SummonScreen() {
     <ScreenFrame
       title="Summon"
       subtitle="Fate Crystals are earned, never bought."
-      background="/characters/backgrounds/sorceress_background.webp"
+      background="characters/backgrounds/sorceress_background.webp"
       aside={
         <div className="currency currency-crystal" style={{ fontSize: 14 }}>
           <Gem size={15} />

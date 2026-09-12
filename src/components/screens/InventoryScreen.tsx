@@ -13,7 +13,7 @@ export function InventoryScreen() {
     <ScreenFrame
       title="Your Pack"
       subtitle="Everything you own, and what it will do for you."
-      background="/characters/backgrounds/bathhouse_lady_background.webp"
+      background="characters/backgrounds/bathhouse_lady_background.webp"
       aside={
         <div style={{ display: 'flex', gap: 14 }}>
           <Vital label="Energy" value={v.energy} max={v.maxEnergy} bar="gold" />

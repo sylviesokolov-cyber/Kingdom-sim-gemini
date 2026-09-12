@@ -22,7 +22,7 @@ export function KingdomScreen() {
     <ScreenFrame
       title="Valenreach"
       subtitle={`${k.population.toLocaleString()} souls, and every one of them downstream of the aqueduct.`}
-      background="/characters/backgrounds/royal_silver_hair_throne.webp"
+      background="characters/backgrounds/royal_silver_hair_throne.webp"
     >
       <div className="screen-cols cols-2">
         <div className="scroll-y" style={{ minHeight: 0 }}>

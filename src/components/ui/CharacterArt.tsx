@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { NpcDefinition } from '../../types';
 
-const FALLBACK = '/characters/vesper_eclipse.png';
+const FALLBACK = 'characters/vesper_eclipse.png';
 
 interface Props {
   npc: NpcDefinition;

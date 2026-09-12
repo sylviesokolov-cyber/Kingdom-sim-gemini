@@ -60,7 +60,7 @@ export default function App() {
           <ScreenFrame
             title="The Council Chamber"
             subtitle="Empty benches, for now."
-            background="/characters/backgrounds/consort_background.webp"
+            background="characters/backgrounds/consort_background.webp"
           >
             <div className="empty">
               <span>You have no standing to be heard here.</span>

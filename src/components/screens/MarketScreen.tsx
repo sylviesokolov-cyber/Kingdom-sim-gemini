@@ -38,7 +38,7 @@ export function MarketScreen() {
           ? 'Your contracts are quoted below the floor rate.'
           : 'Prices are what the floor says they are.'
       }
-      background="/characters/backgrounds/duchess_background.webp"
+      background="characters/backgrounds/duchess_background.webp"
       aside={
         <div className="qty-picker">
           <span className="label">Lot</span>

@@ -23,7 +23,7 @@ export function CharactersScreen() {
     <ScreenFrame
       title="The Retinue"
       subtitle={`${game.retinue.length} of ${roster.length} stand with you.`}
-      background="/characters/backgrounds/queen_background.webp"
+      background="characters/backgrounds/queen_background.webp"
     >
       <div className="scroll-y" style={{ height: '100%' }}>
         <div className="roster">
