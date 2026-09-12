@@ -3,10 +3,15 @@
  *
  * Home is the throne room — the kingdom simulator's command center, not a
  * companion showcase. It carries no character art or portraits: a glance at
- * the kingdom's vitals, then the day's actions, each linking straight into
- * the screen that handles it (Work, the Bourse, Council, Summon, and yes,
- * the Bonds tab — bonding is real but stays a side system, reached the same
- * way as everything else here). See docs/UI_DESIGN_SYSTEM.md.
+ * the kingdom's vitals, a link into whatever event campaign is live, then
+ * the day's actions, each linking straight into the screen that handles it
+ * (Work, the Bourse, Council, Summon, and yes, the Bonds tab — bonding is
+ * real but stays a side system, reached the same way as everything else
+ * here). See docs/UI_DESIGN_SYSTEM.md.
+ *
+ * This has been rebuilt this way twice now after a companion-display version
+ * was tried and reverted both times — see docs/DEVELOPMENT_STATUS.md. Do not
+ * put character art back on this screen.
  *
  * Rules that must hold at every supported width:
  *   - Next Day is always reachable by the right thumb
@@ -83,7 +88,7 @@
 }
 
 /* ------------------------------------------------------------------ *
- * Main column — kingdom vitals, then the day's actions
+ * Main column — kingdom vitals, the event ticker, then the day's actions
  * ------------------------------------------------------------------ */
 
 .home-main {
@@ -112,6 +117,123 @@
 .home-vitals {
   flex-shrink: 0;
   grid-template-columns: repeat(4, 1fr);
+}
+
+/* The live-event banner — text and a tag only, never a character thumbnail.
+   Reuses the .row treatment so it sits in the same visual family as Today's
+   Matters below it. */
+.event-ticker {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 10px;
+  text-align: left;
+  color: var(--gold-400);
+  background: linear-gradient(100deg, rgba(74, 18, 38, 0.55), rgba(28, 13, 26, 0.5));
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  transition: all var(--dur) var(--ease);
+}
+
+.event-ticker:hover {
+  border-color: var(--gold-400);
+}
+
+.event-ticker-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.event-ticker-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold-200);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-ticker-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--parchment);
+}
+
+.event-ticker-dots {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.event-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 5px;
+  font-family: var(--font-ui);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.event-tag-gacha {
+  background: rgba(224, 87, 128, 0.9);
+  color: #fff;
+}
+
+.event-tag-market {
+  background: rgba(201, 162, 39, 0.9);
+  color: var(--ink-950);
+}
+
+.event-tag-realm {
+  background: rgba(79, 157, 105, 0.9);
+  color: var(--ink-950);
+}
+
+.event-tag-bond {
+  background: rgba(244, 166, 191, 0.9);
+  color: var(--ink-950);
+}
+
+.row-title .event-tag {
+  margin: 0 0 0 6px;
+  vertical-align: middle;
+}
+
+.event-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(246, 239, 226, 0.3);
+  cursor: pointer;
+  transition: all var(--dur) var(--ease);
+}
+
+.event-dot.selected {
+  background: var(--gold-400);
+  box-shadow: 0 0 8px -1px var(--ssr-glow);
+}
+
+.home-events-sheet {
+  padding: 16px;
+  max-width: 440px;
+}
+
+.home-events-sheet h3 {
+  color: var(--gold-200);
+  margin: 0 0 8px;
 }
 
 .home-actions-list {
@@ -228,6 +350,10 @@
 
   .home-head h2 {
     font-size: 16px;
+  }
+
+  .event-ticker {
+    padding: 6px 9px;
   }
 }
 

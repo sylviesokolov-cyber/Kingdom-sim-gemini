@@ -124,6 +124,36 @@ export interface EventDefinition {
 }
 
 /* ------------------------------------------------------------------ *
+ * Live events — the limited-time campaigns advertised on Home
+ * ------------------------------------------------------------------ */
+
+/**
+ * A limited-time campaign shown on the Home screen's event banner.
+ *
+ * This is deliberately *not* `EventDefinition`: that is the narrative event
+ * engine's unit (a thing that fires, with choices and effects). A live event
+ * is the storefront for a campaign that is already implemented somewhere —
+ * a rate-up banner on Summon, a festival on the Bourse — so its only job is
+ * to advertise a real destination inside a real day window. It carries no
+ * effects of its own, because a banner that granted rewards on tap would be
+ * a reward button with a picture, not an event.
+ */
+export interface LiveEventDefinition {
+  id: string;
+  name: string;
+  /** One line of diegetic copy — what is happening, in the world's voice. */
+  blurb: string;
+  /** Short badge, e.g. `SSR Rate Up`. Rendered as the card's flag. */
+  tag: string;
+  tone: 'gacha' | 'market' | 'realm' | 'bond';
+  /** Inclusive day window. The event is live when startsOnDay <= day <= endsOnDay. */
+  startsOnDay: number;
+  endsOnDay: number;
+  /** The screen this banner opens. Must be a screen that actually exists. */
+  screen: 'summon' | 'market' | 'kingdom' | 'characters' | 'work' | 'council';
+}
+
+/* ------------------------------------------------------------------ *
  * Bond episodes — VN scenes
  * ------------------------------------------------------------------ */
 
