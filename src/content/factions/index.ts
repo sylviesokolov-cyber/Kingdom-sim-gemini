@@ -1,0 +1,177 @@
+import type { FactionDefinition, FactionId } from '../../types';
+
+/**
+ * The eight interests. Faction power and opinion are independent: the
+ * refugees may adore the player and be able to do nothing about it.
+ */
+export const FACTIONS: Record<FactionId, FactionDefinition> = {
+  crown: {
+    id: 'crown',
+    name: 'The Crown',
+    description: 'The king, the high court, and the machinery of law. Aging, and everyone can see it.',
+    wants: 'Stability, obedience, and an undisputed heir.',
+    leaderNpcId: 'seraphine',
+    color: '#c9a227',
+    relations: [
+      { factionId: 'nobility', standing: 20 },
+      { factionId: 'church', standing: 35 },
+      { factionId: 'military', standing: 45 },
+      { factionId: 'guilds', standing: 15 },
+      { factionId: 'commons', standing: 0 },
+      { factionId: 'refugees', standing: -15 },
+      { factionId: 'syndicate', standing: -70 },
+    ],
+    redLines: [
+      { id: 'crown_succession', description: 'Openly challenging the succession', penalty: 45 },
+      { id: 'crown_treasury', description: 'Seizing or defaulting on the royal treasury', penalty: 35 },
+    ],
+  },
+  nobility: {
+    id: 'nobility',
+    name: 'The Nobility',
+    description: 'Old houses, older grievances. They own the valley and consider that a moral position.',
+    wants: 'Privilege, land, and precedence — in that order.',
+    leaderNpcId: 'ashgrave',
+    color: '#7d1f38',
+    relations: [
+      { factionId: 'crown', standing: 20 },
+      { factionId: 'church', standing: 25 },
+      { factionId: 'military', standing: 10 },
+      { factionId: 'guilds', standing: -20 },
+      { factionId: 'commons', standing: -40 },
+      { factionId: 'refugees', standing: -60 },
+      { factionId: 'syndicate', standing: -10 },
+    ],
+    redLines: [
+      { id: 'noble_tax', description: 'Taxing noble estates', penalty: 50 },
+      { id: 'noble_land', description: 'Seizing noble land for public works', penalty: 60 },
+    ],
+  },
+  church: {
+    id: 'church',
+    name: 'The Church of Sol',
+    description: 'The cathedral, the seminary, and the almshouses. It feeds more people than the crown does.',
+    wants: 'Souls, alms, and unchallenged moral authority.',
+    leaderNpcId: 'beatrix',
+    color: '#e8c86a',
+    relations: [
+      { factionId: 'crown', standing: 35 },
+      { factionId: 'nobility', standing: 25 },
+      { factionId: 'military', standing: 5 },
+      { factionId: 'guilds', standing: -5 },
+      { factionId: 'commons', standing: 45 },
+      { factionId: 'refugees', standing: 40 },
+      { factionId: 'syndicate', standing: -55 },
+    ],
+    redLines: [
+      { id: 'church_land', description: 'Seizing church land or tithes', penalty: 55 },
+      { id: 'church_vice', description: 'Legalising vice, or openly tolerating it', penalty: 40 },
+    ],
+  },
+  military: {
+    id: 'military',
+    name: 'The Military',
+    description: 'The garrison and the walls. The only faction that can simply take what it wants.',
+    wants: 'Pay, walls, and a war worth winning.',
+    leaderNpcId: 'valerius',
+    color: '#5d6f8a',
+    relations: [
+      { factionId: 'crown', standing: 45 },
+      { factionId: 'nobility', standing: 10 },
+      { factionId: 'church', standing: 5 },
+      { factionId: 'guilds', standing: -25 },
+      { factionId: 'commons', standing: 10 },
+      { factionId: 'refugees', standing: -10 },
+      { factionId: 'syndicate', standing: -65 },
+    ],
+    redLines: [
+      { id: 'military_budget', description: 'Cutting the garrison budget', penalty: 45 },
+      { id: 'military_disband', description: 'Disbanding or disarming a company', penalty: 65 },
+    ],
+  },
+  guilds: {
+    id: 'guilds',
+    name: 'The Guilds',
+    description: 'The consortium, the exchange, and every workshop that pays into them.',
+    wants: 'Monopoly, contracts, and guild law above city law.',
+    leaderNpcId: 'silas',
+    color: '#3fa796',
+    relations: [
+      { factionId: 'crown', standing: 15 },
+      { factionId: 'nobility', standing: -20 },
+      { factionId: 'church', standing: -5 },
+      { factionId: 'military', standing: -25 },
+      { factionId: 'commons', standing: -10 },
+      { factionId: 'refugees', standing: 5 },
+      { factionId: 'syndicate', standing: -30 },
+    ],
+    redLines: [
+      { id: 'guild_price', description: 'Fixing prices against the guilds', penalty: 50 },
+      { id: 'guild_foreign', description: 'Admitting foreign goods that undercut members', penalty: 40 },
+    ],
+  },
+  commons: {
+    id: 'commons',
+    name: 'The Commons',
+    description: 'Everyone else. No leader, no organisation, and more of them than anything else.',
+    wants: 'Bread, water, and to be left alone.',
+    color: '#9c7b4a',
+    relations: [
+      { factionId: 'crown', standing: 0 },
+      { factionId: 'nobility', standing: -40 },
+      { factionId: 'church', standing: 45 },
+      { factionId: 'military', standing: 10 },
+      { factionId: 'guilds', standing: -10 },
+      { factionId: 'refugees', standing: -20 },
+      { factionId: 'syndicate', standing: 5 },
+    ],
+    redLines: [
+      { id: 'commons_bread', description: 'Taxing bread or water', penalty: 60 },
+      { id: 'commons_famine', description: 'Letting a famine run unanswered', penalty: 55 },
+    ],
+  },
+  refugees: {
+    id: 'refugees',
+    name: 'The Refugees',
+    description: 'The Ashes. Drought survivors with no legal standing and nowhere else to be.',
+    wants: 'Shelter, work, and the right to testify.',
+    leaderNpcId: 'caren',
+    color: '#8a6b52',
+    relations: [
+      { factionId: 'crown', standing: -15 },
+      { factionId: 'nobility', standing: -60 },
+      { factionId: 'church', standing: 40 },
+      { factionId: 'military', standing: -10 },
+      { factionId: 'guilds', standing: 5 },
+      { factionId: 'commons', standing: -20 },
+      { factionId: 'syndicate', standing: 15 },
+    ],
+    redLines: [
+      { id: 'refugee_expulsion', description: 'Ordering expulsions from the Ashes', penalty: 70 },
+      { id: 'refugee_ration', description: 'Cutting the Ashes off the ration rolls', penalty: 50 },
+    ],
+  },
+  syndicate: {
+    id: 'syndicate',
+    name: 'The Nightshade Syndicate',
+    description: 'The catacombs, the black market, and every debt nobody will name in daylight.',
+    wants: 'Free trade in absolutely everything.',
+    leaderNpcId: 'vesper',
+    color: '#8b5cf6',
+    relations: [
+      { factionId: 'crown', standing: -70 },
+      { factionId: 'nobility', standing: -10 },
+      { factionId: 'church', standing: -55 },
+      { factionId: 'military', standing: -65 },
+      { factionId: 'guilds', standing: -30 },
+      { factionId: 'commons', standing: 5 },
+      { factionId: 'refugees', standing: 15 },
+    ],
+    redLines: [
+      { id: 'syndicate_customs', description: 'A customs crackdown that actually works', penalty: 50 },
+      { id: 'syndicate_betrayal', description: 'Informing on the Syndicate to the crown', penalty: 75 },
+    ],
+  },
+};
+
+export const FACTION_LIST: FactionDefinition[] = Object.values(FACTIONS);
