@@ -44,8 +44,6 @@ interface UiState {
   /** Talk counts per npc today, for the diminishing-returns pass. */
   talksToday: Record<string, number>;
   lastPullResults: PullResult[] | null;
-  /** Home's event-banner carousel position. Presentation only — not saved. */
-  homeEventIndex: number;
 }
 
 export interface GameStore {
@@ -60,7 +58,6 @@ export interface GameStore {
   /* --- navigation --- */
   setScreen: (screen: ScreenId) => void;
   setActiveCompanion: (npcId: string) => void;
-  setHomeEventIndex: (index: number) => void;
   dismissDigest: () => void;
   pushToast: (message: string, tone?: Toast['tone']) => void;
 
@@ -87,7 +84,6 @@ function initialUi(): UiState {
     interactedToday: [],
     talksToday: {},
     lastPullResults: null,
-    homeEventIndex: 0,
   };
 }
 
@@ -120,10 +116,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
   setActiveCompanion(npcId) {
     set((s) => ({ game: { ...s.game, activeCompanionId: npcId } }));
     get().save();
-  },
-
-  setHomeEventIndex(index) {
-    set((s) => ({ ui: { ...s.ui, homeEventIndex: index } }));
   },
 
   dismissDigest() {

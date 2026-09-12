@@ -5,7 +5,7 @@
 > Never mark `[x]` without having actually run the check.
 
 **Current phase:** Phase 3 — Simulation core (partial). Phases 0–2 complete.
-**Last updated:** 2026-09-12 (Home given a live-event banner; a companion-display attempt was tried and reverted again in the same session — see the change-log entry below)
+**Last updated:** 2026-09-12 (Home rebuilt again — spare, image-first: one backdrop, the rail, a single progression card — see the change-log entry below)
 
 ---
 
@@ -45,14 +45,17 @@
 
 ## Phase 2 — Vertical slice — COMPLETE
 
-- [x] Home screen: a companion-free kingdom dashboard — a kingdom-vitals
-      strip (population, welfare, unrest, treasury), a live-event banner
-      (`src/content/events/`, day-windowed, text/tag only — no character
-      art), and a Day's Actions list driving to every other tab. The owner
-      clarified that the main game is the kingdom simulator and bonding is a
-      side system; Home carries no character art, portraits, or scene-picking
-      as a result — reconfirmed a third time in the 2026-09-12 change-log
-      entries below after two separate attempts to add companion art back.
+- [x] Home screen: one full-bleed painted backdrop
+      (`public/backgrounds/home_dusk_gold.jpg`), the shared utility rail
+      (Mail/Quests/Events/Notice), and a single card showing the player's
+      next step toward their next estate (via `canPromoteEstate`) — tap to
+      open the screen that handles it. The kingdom-vitals grid and the
+      multi-row Day's Actions list from earlier the same day were cut on the
+      owner's direct instruction not to clutter the screen with text; Events
+      stays reachable through the rail's modal sheet
+      (`src/content/events/`, day-windowed, text/tag only) rather than a
+      permanent on-screen banner. No companion art or bond content, as
+      settled repeatedly earlier the same day — see below.
 - [x] Bonds tab (Characters screen): a full-bleed hero screen — the
       companion's art fills the stage with Talk/Gift/Bond, the tier/affection
       readout, and traits overlaid directly on it, plus a right-side rail
@@ -117,14 +120,43 @@ companion art, and treat a genre-comparison ask ("does this look like
 [gacha game]?") as a question to answer about the *existing* screen, not
 a license to rebuild it toward the reference.
 
+**2026-09-12 — Home rebuilt a fourth time, this one from explicit
+requirements.** The owner then gave direct, itemized spec for Home rather
+than a reference image to interpret: one background image from
+`public/backgrounds/` (an existing painted plate, not a new asset), the HUD
+(already global), buttons to reach kingdom-specific screens (already global
+— the dock), a single quest/objective for the player's current role, and
+explicitly *no* clutter — "don't clutter the home screen with many texts,
+options." Read as a spec, not a reference to copy visually, this landed as:
+`.scene-bg`/`.scene-vignette` (shared with the Bonds tab) behind a fixed
+backdrop, the existing utility rail unchanged, and one new card —
+`.home-quest` — computing the player's actual next step from
+`canPromoteEstate`/`ESTATE_LADDER` (their next estate's title plus the
+first blocking reason, or "ready to petition" once eligible) rather than
+authored flavor text. The kingdom-vitals grid, the Day's Actions list, and
+the on-screen event banner all built earlier the same day were removed as
+exactly the clutter the owner was pointing at; `homeEventIndex` and
+`setHomeEventIndex` were removed from the store with them since nothing
+uses a "featured" event pick anymore — the Events sheet lists all of
+`activeEvents()` directly. `src/content/events/` itself is unchanged and
+still real, day-windowed data, just reached only through the rail's modal.
+
+This did **not** reopen the companion-art question — no character art or
+bond content was added or discussed. It is a separate design pass on the
+same companion-free screen, not a fourth reversal of the settled
+companion decision above.
+
 ### Verified by playthrough
-A player can, from a fresh save: read the kingdom's vitals, the live event
-banner (a real day-windowed campaign, tappable into its screen), and Day's
-Actions on Home, open the Bonds tab and read a companion's mood-varied
-line, talk to raise affection, gift from the pack (favourites correctly
-surfaced first), work a job, see the goods land in the pack, trade them on
-the Bourse, run a ten-pull and get Resonance from a duplicate, advance the
-day, and read a digest explaining why prices moved. State survives reload.
+A player can, from a fresh save: read Home's quest card (a real next-step
+computed from `canPromoteEstate`, correct at day 1 and after advancing
+days), open the Events sheet from the rail and tap into a live campaign's
+screen, open the Bonds tab and read a companion's mood-varied line, talk to
+raise affection, gift from the pack (favourites correctly surfaced first),
+work a job, see the goods land in the pack, trade them on the Bourse, run a
+ten-pull and get Resonance from a duplicate, advance the day, and read a
+digest explaining why prices moved. State survives reload — verified via a
+headless render at 740x360, 900x420 and 1280x600, no console errors, no
+overlapping UI at any size.
 
 ---
 
