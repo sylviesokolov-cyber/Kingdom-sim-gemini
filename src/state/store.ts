@@ -44,13 +44,6 @@ interface UiState {
   /** Talk counts per npc today, for the diminishing-returns pass. */
   talksToday: Record<string, number>;
   lastPullResults: PullResult[] | null;
-  /**
-   * Home's "hide UI" mode — background and companion only, no chrome.
-   * Session-local by design (not persisted): it always starts off, and
-   * leaving Home clears it so no other screen can be silently left
-   * chromeless. See App.tsx for the HUD/dock hiding this drives.
-   */
-  immersive: boolean;
 }
 
 export interface GameStore {
@@ -65,8 +58,6 @@ export interface GameStore {
   /* --- navigation --- */
   setScreen: (screen: ScreenId) => void;
   setActiveCompanion: (npcId: string) => void;
-  setHomeScene: (index: number) => void;
-  setImmersive: (immersive: boolean) => void;
   dismissDigest: () => void;
   pushToast: (message: string, tone?: Toast['tone']) => void;
 
@@ -93,7 +84,6 @@ function initialUi(): UiState {
     interactedToday: [],
     talksToday: {},
     lastPullResults: null,
-    immersive: false,
   };
 }
 
@@ -120,23 +110,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   /* ---------------------------------------------------------------- */
   setScreen(screen) {
-    // Immersive mode is a Home-only idea. Leaving Home always clears it, so
-    // no other screen can be silently left without its chrome.
-    set((s) => ({ ui: { ...s.ui, screen, immersive: screen === 'home' ? s.ui.immersive : false } }));
+    set((s) => ({ ui: { ...s.ui, screen } }));
   },
 
   setActiveCompanion(npcId) {
     set((s) => ({ game: { ...s.game, activeCompanionId: npcId } }));
     get().save();
-  },
-
-  setHomeScene(index) {
-    set((s) => ({ game: { ...s.game, homeSceneIndex: index } }));
-    get().save();
-  },
-
-  setImmersive(immersive) {
-    set((s) => ({ ui: { ...s.ui, immersive } }));
   },
 
   dismissDigest() {

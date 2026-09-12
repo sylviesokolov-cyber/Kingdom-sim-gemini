@@ -5,7 +5,7 @@
 > Never mark `[x]` without having actually run the check.
 
 **Current phase:** Phase 3 — Simulation core (partial). Phases 0–2 complete.
-**Last updated:** 2026-09-12 (Home immersive mode + Bonds hero-screen redesign)
+**Last updated:** 2026-09-12 (Home reverted to a companion-free kingdom dashboard)
 
 ---
 
@@ -45,12 +45,13 @@
 
 ## Phase 2 — Vertical slice — COMPLETE
 
-- [x] Home screen: a day-action hub with an ambient, idle-animated companion
-      display and a Day's Actions list driving to every other tab
-- [x] Home immersive ("hide UI") mode: an Azur Lane/Brown Dust 2-style toggle
-      that drops every panel (HUD, dock, side rail, actions, stage controls)
-      to show only the backdrop and companion, restorable by tapping
-      anywhere on the stage or the same toggle
+- [x] Home screen: a companion-free kingdom dashboard — a kingdom-vitals
+      strip (population, welfare, unrest, treasury) and a Day's Actions list
+      driving to every other tab. The owner clarified that the main game is
+      the kingdom simulator and bonding is a side system; Home carries no
+      character art, portraits, or scene-picking as a result (see the
+      2026-09-12 "Home reverted" change-log entry — this superseded the
+      immersive-mode/companion-display version built earlier the same day).
 - [x] Bonds tab (Characters screen): a full-bleed hero screen — the
       companion's art fills the stage with Talk/Gift/Bond, the tier/affection
       readout, and traits overlaid directly on it, plus a right-side rail
@@ -68,30 +69,32 @@
 - [x] Inventory with consumables
 - [x] Verified at 900x420 and 740x360 landscape, no console errors
 
-**2026-09-12 redesign — Home and Bonds split.** Home originally hosted the
-companion panel and dialogue directly (matching the first reference
-mockup). The owner asked for a split: Home became a decorative, action-hub
-screen with an ambient "L2D-style" companion display the player can choose
-and a chambers backdrop the player can cycle; all companion interaction
-(Talk/Gift/Assist, the quote line, the relationship-dimension detail) moved
-into the Bonds tab. See `docs/UI_DESIGN_SYSTEM.md` for the current Home
-composition and `docs/systems/BONDS.md` for the interaction model — both
-were already written to describe interaction as a Bonds-tab concern, so no
-system doc needed correcting, only this tracker and the screen itself.
+**2026-09-12 redesign — Home and Bonds split, then Home reverted again.**
+Home originally hosted the companion panel and dialogue directly (matching
+the first reference mockup). The owner then asked for a split: Home became
+an action-hub screen with an ambient "L2D-style" companion display and a
+chambers backdrop, while all companion interaction (Talk/Gift/Assist, the
+quote line, the relationship-dimension detail) moved into the Bonds tab.
+Later the same day the owner clarified further: the main game is the
+kingdom simulator, and bonding/companions are a side system that should
+never be forced onto Home's screen. Home was rebuilt again as a
+companion-free kingdom dashboard (see the "Home reverted" change-log entry)
+— the Bonds-tab destination from the split stands, only Home's own content
+changed a second time. See `docs/UI_DESIGN_SYSTEM.md` for the current Home
+composition and `docs/systems/BONDS.md` for the interaction model.
 
-The "L2D-style" idle motion is a CSS approximation (breathing/sway keyframe
-+ pointer-parallax on the anchor), not real Live2D rigging — the roster is
-single flattened portraits, not layered/rigged source art. Documented as
-such in `src/styles/home.css`.
+The "L2D-style" idle motion (breathing/sway keyframe + pointer-parallax) is
+still used, just only on the Bonds tab now — it is a CSS approximation, not
+real Live2D rigging, since the roster is single flattened portraits, not
+layered/rigged source art. Documented in `src/styles/screens.css`.
 
 ### Verified by playthrough
-A player can, from a fresh save: pick which companion appears on the Home
-stage and cycle the chambers backdrop, open the Bonds tab and read a
-companion's mood-varied line, talk to raise affection, gift from the pack
-(favourites correctly surfaced first), work a job, see the goods land in
-the pack, trade them on the Bourse, run a ten-pull and get Resonance from a
-duplicate, advance the day, and read a digest explaining why prices moved.
-State survives reload.
+A player can, from a fresh save: read the kingdom's vitals and Day's
+Actions on Home, open the Bonds tab and read a companion's mood-varied
+line, talk to raise affection, gift from the pack (favourites correctly
+surfaced first), work a job, see the goods land in the pack, trade them on
+the Bourse, run a ten-pull and get Resonance from a duplicate, advance the
+day, and read a digest explaining why prices moved. State survives reload.
 
 ---
 
@@ -129,6 +132,13 @@ it against the real population was the only way to know it worked.
       explaining what unlocks them).
 - [ ] Character art is shared between some characters; the roster needs
       bespoke plates. The stage crop assumes the square-canvas source art.
+- [ ] `public/characters/backgrounds/royal_silver_hair_throne.webp` (the
+      Kingdom screen's background) is not a valid image file — found while
+      testing this change-log entry's Home rework. It fails silently (a CSS
+      `background-image` with no `onError` fallback, unlike `CharacterArt`),
+      so the Kingdom screen just shows its scrim with no backdrop. Needs a
+      real replacement asset; not fixed here since it's outside this
+      change's scope.
 
 ---
 
@@ -218,6 +228,58 @@ Driven with Playwright at 900x420 and 740x360, landscape.
 ---
 
 ## Change log
+
+### 2026-09-12 — Home reverted to a companion-free kingdom dashboard
+The owner corrected course on the same day's earlier Home redesigns: the
+main game is a kingdom simulator (peasant to king), and companion bonding —
+talking, gifting, charming, intimacy, adding to a retinue for perks — is a
+real but *side* system. Forcing companion art, portraits, or a bonding
+concept onto the primary screen was wrong regardless of how polished it
+looked; Home needed to go back to being about the kingdom.
+
+- **Removed every companion element from Home.** No `CharacterArt`, no
+  L2D idle stage, no chambers backdrop/scene picker, no companion switcher.
+  Home is now a `.home-main` column: a `Kingdom-at-a-glance` stat row
+  (population, welfare, unrest, treasury — read from existing `game.kingdom`
+  state, no new engine logic) above the existing Day's Actions list. The
+  side rail (Mail/Quests/Events/Notice) stays, since it was never
+  companion-specific. The list still links to Bonds with a live status line
+  ("N companions bonded" / who needs tending), same as any other tab — it's
+  no longer first or visually privileged in the list order.
+- **Removed the immersive ("hide UI") mode entirely.** Its whole purpose was
+  seeing the Home companion clearly; with no companion on Home, the feature
+  had nothing left to do. Removed `ui.immersive`/`setImmersive` from the
+  store, the `hideChrome` logic and `onHideUi` prop from `App.tsx`/
+  `HeaderHud.tsx`, and the Eye/EyeOff toggle UI.
+- **Removed the Home scene-picker system.** `homeSceneIndex` (persisted
+  field), `HOME_SCENES`/`homeSceneAt` (`content/homeScenes.ts`, deleted),
+  and `setHomeScene` are gone — Home no longer has a backdrop to cycle.
+  `activeCompanionId`/`setActiveCompanion` stay: they still do real work
+  defaulting which companion the Bonds tab opens on.
+- **Home's backdrop is now non-photographic.** No image asset — a subtle
+  CSS radial-gradient wash in the existing wine/gold tokens, so Home reads
+  as "dark royal" without depicting any character. (The three
+  `home_*` background plates from the earlier redesign are now unused; left
+  in `public/backgrounds/` rather than deleted, in case a future *kingdom*
+  backdrop system wants art of that quality bar.)
+- **CSS**: `.stage`, `.l2d-anchor`, `.stage-art`, `@keyframes l2d-idle`,
+  `.stage-controls`, `.retinue-strip`/`.retinue-avatar`, `.scene-bg`, and
+  `.scene-vignette` moved from `home.css` to `screens.css`, since the Bonds
+  hero screen is now their only consumer. `home.css` was rewritten for the
+  new dashboard layout (`.home-main`, `.home-head`, `.home-vitals`,
+  `.home-actions-list`).
+- Also fixed, per explicit request: the Home/Bonds backdrop blur (added in
+  the prior redesign to soften a photographic backdrop) is removed entirely
+  now that Bonds is the only screen using it — `filter` is
+  `saturate(1) brightness(0.8)`, no `blur()`.
+- Verified: typecheck, all 81 tests (including the save round-trip test,
+  confirming the field removals don't break existing saves), and the
+  production build pass. Checked at 900×420 and 740×360 landscape via
+  Playwright — Home shows no character art, the stat row and actions list
+  render correctly, and the Bonds tab (unaffected by this change) still
+  works. The one console error seen (`ERR_CONNECTION_RESET` on Google
+  Fonts) is this sandbox's network policy blocking an external font CDN,
+  not an app bug — confirmed by request-level tracing, not just observed.
 
 ### 2026-09-12 — Home immersive mode + Bonds hero-screen redesign
 Follow-up correction to the same-day Home/Bonds split, after the owner

@@ -108,12 +108,6 @@ export function migrateSave(raw: unknown): GameState | null {
       ? source.activeCompanionId
       : fresh.activeCompanionId;
 
-  // A save from before the scene picker existed simply gets the default scene.
-  const homeSceneIndex =
-    typeof source.homeSceneIndex === 'number' && Number.isFinite(source.homeSceneIndex)
-      ? source.homeSceneIndex
-      : fresh.homeSceneIndex;
-
   return {
     version: SAVE_VERSION,
     seed: typeof source.seed === 'number' ? source.seed : fresh.seed,
@@ -128,7 +122,6 @@ export function migrateSave(raw: unknown): GameState | null {
     gacha,
     activeCompanionId,
     retinue,
-    homeSceneIndex,
     firedEvents: Array.isArray(source.firedEvents) ? source.firedEvents : [],
     scheduled: Array.isArray(source.scheduled) ? source.scheduled : [],
     lastDigest: Array.isArray(source.lastDigest) ? source.lastDigest : [],

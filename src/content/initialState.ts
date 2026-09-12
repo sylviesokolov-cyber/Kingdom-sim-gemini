@@ -182,7 +182,6 @@ export function createNewGame(seed?: number, playerName = 'Syl'): GameState {
     },
     activeCompanionId: 'caren',
     retinue: ['caren', 'mira', 'vesper', 'lyra', 'sylvie'],
-    homeSceneIndex: 0,
     firedEvents: [],
     scheduled: [],
     lastDigest: [],

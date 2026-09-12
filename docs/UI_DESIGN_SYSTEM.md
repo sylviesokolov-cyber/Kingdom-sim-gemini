@@ -81,11 +81,11 @@ border-radius: 14px;
 
 ## 3. The Home screen
 
-**Home holds no companion interaction.** `02-home-screen-mockup.png` set the original visual
-target — illustration-first, dark-royal-gold, character-anchored — but as of the 2026-09-12
-redesign Home is the player's own chambers: a day-action hub with a purely decorative,
-idle-animated companion display. Talk, Gift, and Bond live in the Bonds tab
-(`CharactersScreen`) instead — see `docs/systems/BONDS.md`.
+**Home is the kingdom simulator's command center. It carries no companion art, portraits, or
+bonding concept at all.** The main game is peasant-to-king kingdom simulation; bonding is a real
+but *side* system that lives entirely in the Bonds tab (`CharactersScreen`) — see
+`docs/systems/BONDS.md`. Two earlier redesigns the same day put an idle-animated companion display
+front and center on Home; the owner corrected that, and this is the standing design.
 
 Zones, clockwise from top-left:
 
@@ -93,38 +93,29 @@ Zones, clockwise from top-left:
 |---|---|
 | **Player chip** (top-left) | Avatar, name, `Lv. 12 Outsider`, next-estate progress bar |
 | **Currency bar** (top-center) | Copper, Guild Marks, Fate Crystals, Bond Hearts |
-| **Realm chip** (top-right) | `Day 1`, weather, **hide-UI toggle**, settings |
+| **Realm chip** (top-right) | `Day 1`, weather, settings |
 | **Side rail** (left edge) | Mail · Quests · Events · Notice — each with an unread dot |
-| **Location label** (top-center, over the stage) | `Valenreach · {scene name} · Day {n}` |
-| **Character stage** (center) | The chosen companion, idle-animated, over the chambers backdrop |
-| **Stage controls** (bottom-center, over the stage) | Scene-cycle button + a companion-picker avatar strip — purely cosmetic, no dialogue or affection change |
-| **Day's Actions** (right) | A `.row-list` of live-status cards — Work, Market, Bonds, Kingdom, Summon, Council — each tapping straight into that tab |
+| **Kingdom-at-a-glance** (`.home-vitals`) | Population, Welfare, Unrest, Treasury — read straight from `game.kingdom`, no new engine logic |
+| **Day's Actions** (`.home-actions-list`) | A `.row-list` of live-status cards — Valenreach, Work, the Bourse, Council, Summon, and Bonds last — each tapping straight into that tab |
 | **Bottom dock** | Home · Kingdom · Bonds · Work · Market · Council · Summon · Inventory |
 | **Next Day** (bottom-right) | The single largest button on the screen |
 
-**The idle companion display ("L2D-style").** The roster is single flattened portraits, not
-rigged/layered Live2D source art, so this is a CSS approximation of the same feeling rather than
-real Live2D: a breathe-and-sway keyframe animation baked into the art (`@keyframes l2d-idle`),
-plus a slow parallax drift toward the pointer on desktop only (gated to `pointerType === 'mouse'`
-so touch dragging never triggers it, and to a `prefers-reduced-motion` check before it ever writes
-a CSS variable). See `.l2d-anchor` / `.stage-art` in `src/styles/home.css`.
+**Background:** no photographic backdrop. `.home::before` is a subtle CSS radial-gradient wash in
+the existing wine/gold tokens — "dark royal" without depicting any character. The three
+`home_*` chambers plates from the discarded companion-display version are unused now (left in
+`public/backgrounds/`, not deleted, in case a future *kingdom* backdrop system wants art at that
+quality bar).
 
-**Immersive ("hide UI") mode.** Azur Lane/Brown Dust 2-style: an Eye button in the HUD (visible
-only on Home) drops every panel — HUD, dock, side rail, location label, stage controls, Day's
-Actions — leaving only the backdrop and companion. An EyeOff button appears in the same corner to
-restore, and tapping anywhere on the stage does the same. Session-local (`ui.immersive`, not
-persisted) and Home-only: leaving Home always clears it, so no other screen can be left
-chromeless. See `setImmersive` / `hideChrome` in `src/state/store.ts` and `src/App.tsx`.
-
-**Rules:** the companion's face is never covered by a panel. `Next Day` is always reachable by the
-right thumb. The stage controls never gate a mechanic — cycling the scene or the displayed
-companion is cosmetic, never an affection/trust change.
+**Rules:** `Next Day` is always reachable by the right thumb. The Bonds row in Day's Actions is a
+plain nav link with a live status line, exactly like every other row — never visually privileged,
+never the list's first or largest entry.
 
 ### The Bonds tab
 
-Companion interaction's actual home — a full-bleed hero screen, not a roster-grid-first pattern.
-The companion's art fills the stage (reusing Home's `.scene-bg`/`.scene-vignette`/`.stage`
-treatment) with the interaction UI overlaid directly on it:
+Companion interaction's actual home — a full-bleed hero screen, not a roster-grid-first pattern,
+and the *only* screen with a full-bleed character render. The companion's art fills the stage
+(`.scene-bg`/`.scene-vignette`/`.stage`, all in `screens.css` since Home no longer uses them) with
+the interaction UI overlaid directly on it:
 
 | Zone | Contents |
 |---|---|
@@ -141,6 +132,13 @@ affection bars) and the gift picker (favourites-first sort) are unchanged from t
 implementation, just reachable from the stage controls and the Gift button respectively instead
 of always-open.
 
+**The idle companion display ("L2D-style").** The roster is single flattened portraits, not
+rigged/layered Live2D source art, so this is a CSS approximation of the same feeling rather than
+real Live2D: a breathe-and-sway keyframe animation baked into the art (`@keyframes l2d-idle`),
+plus a slow parallax drift toward the pointer on desktop only (gated to `pointerType === 'mouse'`
+so touch dragging never triggers it, and to a `prefers-reduced-motion` check before it ever writes
+a CSS variable). See `.l2d-anchor` / `.stage-art` in `src/styles/screens.css`.
+
 **Intimacy and its gallery are content-guide-bound the same as everything else**: whatever lands
 there must stay suggestive/fade-to-black, never explicit, per `docs/CONTENT_GUIDE.md` — the stub
 naming them now does not change that constraint later.
@@ -154,7 +152,7 @@ From `03-full-ui-screen-map.png`:
 | # | Screen | Identity | Primary content |
 |---|---|---|---|
 | 1 | Title | Key art + gold serif logotype | New Game · Continue · Settings · Gallery · Exit |
-| 2 | **Home** | The player's chambers, day-action hub | The layout above — decorative only, no interaction |
+| 2 | **Home** | Kingdom command center | The layout above — kingdom vitals + Day's Actions, no companion content |
 | 3 | Kingdom Map | Painted realm overview | District pins, vitals, supply chains, investment |
 | 4 | **Bonds** (Character Roster) | Gallery grid, rarity frames | Filter by faction, sort by rarity/affection |
 | 5 | Bonds detail (Character Profile) | Portrait + full detail | Talk/Gift/Assist · Relationship dimensions · Outfits · Bond Scenes · Voice · Stories |

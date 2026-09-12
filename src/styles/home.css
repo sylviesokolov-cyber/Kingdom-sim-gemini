@@ -1,19 +1,15 @@
 /**
  * The Home screen.
  *
- * Home is the player's own chambers — a day-action hub with an ambient,
- * idle-animated ("L2D-style") companion display the player can pick and
- * change the backdrop for. It holds no companion interactions: Talk, Gift,
- * and Assist live in the Bonds tab (CharactersScreen). See
- * docs/UI_DESIGN_SYSTEM.md and docs/DEVELOPMENT_STATUS.md for the record of
- * this split.
+ * Home is the throne room — the kingdom simulator's command center, not a
+ * companion showcase. It carries no character art or portraits: a glance at
+ * the kingdom's vitals, then the day's actions, each linking straight into
+ * the screen that handles it (Work, the Bourse, Council, Summon, and yes,
+ * the Bonds tab — bonding is real but stays a side system, reached the same
+ * way as everything else here). See docs/UI_DESIGN_SYSTEM.md.
  *
  * Rules that must hold at every supported width:
- *   - the companion's face is never covered by a panel
  *   - Next Day is always reachable by the right thumb
- *
- * `.scene-bg` / `.scene-vignette` are shared with the Bonds tab's full-bleed
- * hero screen, not Home-exclusive despite living in this file.
  */
 
 .home {
@@ -22,26 +18,16 @@
   overflow: hidden;
 }
 
-.scene-bg {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center 30%;
-  /* Lighter than the first pass: the owner asked to actually see the
-     backdrop (Azur Lane / Brown Dust 2 register), so this now reads as a
-     real place behind the companion rather than pure atmosphere. */
-  transform: scale(1.1);
-  filter: saturate(1) brightness(0.8) blur(2px);
-  transition: opacity 320ms var(--ease);
-}
-
-.scene-vignette {
+/* Ambient royal glow — no photographic backdrop, just the material language
+   (dark royal ground, gold/wine accents) the rest of the app already uses. */
+.home::before {
+  content: '';
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 60% 55% at 50% 42%, transparent 50%, rgba(10, 5, 9, 0.32) 100%),
-    linear-gradient(180deg, rgba(10, 5, 9, 0.55) 0%, transparent 22%, transparent 58%, rgba(10, 5, 9, 0.75) 100%),
-    linear-gradient(90deg, rgba(10, 5, 9, 0.4) 0%, transparent 26%, transparent 74%, rgba(10, 5, 9, 0.45) 100%);
+    radial-gradient(ellipse 70% 55% at 50% -8%, rgba(125, 31, 56, 0.3), transparent 60%),
+    radial-gradient(ellipse 55% 50% at 100% 100%, rgba(201, 162, 39, 0.1), transparent 60%);
+  pointer-events: none;
 }
 
 /* ------------------------------------------------------------------ *
@@ -97,198 +83,40 @@
 }
 
 /* ------------------------------------------------------------------ *
- * The L2D-style companion stage
- *
- * We do not have rigged, layered Live2D source art — the roster is single
- * flattened portraits. This approximates the same *feeling* (a character who
- * reads as present rather than a static poster) with two independent motion
- * layers instead: an idle breathe-and-sway loop baked into the art itself,
- * and a slow parallax drift toward the pointer applied to its anchor. Both
- * respect prefers-reduced-motion — the breathing via the global animation
- * kill-switch in base.css, the parallax via a JS-side check before it ever
- * writes a CSS variable.
+ * Main column — kingdom vitals, then the day's actions
  * ------------------------------------------------------------------ */
 
-.stage {
+.home-main {
   position: absolute;
-  left: 50%;
-  top: 48px;
-  bottom: 0;
-  transform: translateX(-50%);
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  overflow: hidden;
-}
-
-.l2d-anchor {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: translate3d(var(--tiltX, 0px), var(--tiltY, 0px), 0);
-  transition: transform 260ms ease-out;
-  will-change: transform;
-}
-
-.stage-art {
-  /* The source plates are square, with the figure occupying roughly the
-     middle 59% of the canvas. Overscaling brings her up to stage height. */
-  height: 172%;
-  width: auto;
-  max-width: none;
-  object-fit: contain;
-  object-position: center;
-  filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.8));
-  animation: stage-enter 420ms var(--ease), l2d-idle 5400ms ease-in-out 420ms infinite;
-  transform-origin: 50% 85%;
-}
-
-@keyframes stage-enter {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes l2d-idle {
-  0%,
-  100% {
-    transform: translateY(-1%) rotate(0deg) scale(1);
-  }
-  50% {
-    transform: translateY(-1.8%) rotate(0.35deg) scale(1.007);
-  }
-}
-
-.location-label {
-  position: absolute;
-  top: 62px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 15;
-  font-family: var(--font-ui);
-  font-size: 9px;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: rgba(242, 224, 168, 0.72);
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
-  white-space: nowrap;
-}
-
-/* ------------------------------------------------------------------ *
- * Immersive ("hide UI") toggle — Azur Lane / Brown Dust 2 style: strip
- * every panel and see only the backdrop and companion. Always visible
- * itself, in both states, so the player is never stuck without chrome.
- * ------------------------------------------------------------------ */
-
-.immersive-toggle {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  z-index: 50;
-}
-
-/* ------------------------------------------------------------------ *
- * Stage controls — change the scene, change who stands in it
- * ------------------------------------------------------------------ */
-
-.stage-controls {
-  position: absolute;
-  left: 50%;
-  bottom: 74px;
-  transform: translateX(-50%);
-  z-index: 25;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 10px;
-  border-radius: 30px;
-  background: rgba(10, 5, 9, 0.55);
-  border: 1px solid rgba(201, 162, 39, 0.26);
-  backdrop-filter: blur(6px);
-}
-
-.scene-name {
-  font-family: var(--font-ui);
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  padding: 0 2px;
-  white-space: nowrap;
-}
-
-/* ------------------------------------------------------------------ *
- * Companion picker strip — reused avatar treatment, no bonding data here
- * ------------------------------------------------------------------ */
-
-.retinue-strip {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-}
-
-.retinue-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid rgba(201, 162, 39, 0.28);
-  flex-shrink: 0;
-  transition: all var(--dur) var(--ease);
-  position: relative;
-}
-
-.retinue-avatar img {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 250%;
-  height: auto;
-  max-width: none;
-  transform: translate(-50%, -32%);
-}
-
-.retinue-avatar.selected {
-  border-color: var(--gold-400);
-  box-shadow: 0 0 12px -2px var(--ssr-glow);
-}
-
-.retinue-avatar.ill::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(179, 58, 58, 0.32);
-}
-
-/* ------------------------------------------------------------------ *
- * Day's Actions — the right column, now the primary content of Home
- * ------------------------------------------------------------------ */
-
-.home-actions {
-  position: absolute;
-  right: 10px;
-  top: 60px;
-  bottom: 78px;
-  z-index: 30;
-  width: min(300px, 34%);
+  left: 78px;
+  right: 14px;
+  top: 58px;
+  bottom: 14px;
+  z-index: 20;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  background: var(--panel);
-  border: var(--panel-border);
-  border-radius: var(--panel-radius);
-  box-shadow: var(--panel-shadow);
-  backdrop-filter: blur(12px);
+  gap: 10px;
+  min-height: 0;
 }
 
-.home-actions-head h2 {
-  font-size: 17px;
+.home-head {
+  flex-shrink: 0;
+}
+
+.home-head h2 {
+  font-size: 19px;
   color: var(--gold-200);
   margin-top: 2px;
+}
+
+.home-vitals {
+  flex-shrink: 0;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.home-actions-list {
+  flex: 1;
+  min-height: 0;
 }
 
 /* ------------------------------------------------------------------ *
@@ -392,40 +220,29 @@
     padding: 5px 3px;
   }
 
-  .location-label {
+  .home-main {
     top: 50px;
-    font-size: 8px;
+    bottom: 10px;
+    gap: 6px;
   }
 
-  .home-actions {
-    top: 48px;
-    bottom: 58px;
-    padding: 8px;
-    gap: 5px;
-  }
-
-  .stage-controls {
-    bottom: 62px;
-    padding: 4px 8px;
-    gap: 7px;
-  }
-
-  .retinue-avatar {
-    width: 32px;
-    height: 32px;
+  .home-head h2 {
+    font-size: 16px;
   }
 }
 
 @media (max-width: 860px) {
-  .home-actions {
-    width: 236px;
+  .home-main {
+    left: 68px;
     top: 54px;
-    bottom: 72px;
-    padding: 9px;
   }
 
-  .home-actions-head h2 {
-    font-size: 15px;
+  .home-head h2 {
+    font-size: 16px;
+  }
+
+  .home-vitals {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .dock {
@@ -435,9 +252,5 @@
   .dock-tab {
     min-width: 50px;
     height: 46px;
-  }
-
-  .stage-controls {
-    bottom: 66px;
   }
 }
