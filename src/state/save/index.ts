@@ -124,6 +124,16 @@ export function migrateSave(raw: unknown): GameState | null {
     retinue,
     firedEvents: Array.isArray(source.firedEvents) ? source.firedEvents : [],
     scheduled: Array.isArray(source.scheduled) ? source.scheduled : [],
+    // v3 → v4: narrative events. A save written before the event engine
+    // existed has no queue, and an empty one is correct — the next day advance
+    // rolls for the first one.
+    pendingEvents: Array.isArray(source.pendingEvents)
+      ? source.pendingEvents.filter((id): id is string => typeof id === 'string')
+      : [],
+    eventHistory:
+      typeof source.eventHistory === 'object' && source.eventHistory
+        ? (source.eventHistory as Record<string, number>)
+        : {},
     lastDigest: Array.isArray(source.lastDigest) ? source.lastDigest : [],
     completedQuests: Array.isArray(source.completedQuests) ? source.completedQuests : [],
     gallery: Array.isArray(source.gallery) ? source.gallery : [],

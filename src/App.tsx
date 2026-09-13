@@ -13,6 +13,7 @@ import { SummonScreen } from './components/screens/SummonScreen';
 import { InventoryScreen } from './components/screens/InventoryScreen';
 import { ScreenFrame } from './components/layout/ScreenFrame';
 import { DigestModal } from './components/ui/DigestModal';
+import { EventModal } from './components/ui/EventModal';
 
 /**
  * The app shell. This component routes and renders — it holds no game rules.
@@ -93,6 +94,9 @@ export default function App() {
         </div>
 
         {showDigest && <DigestModal />}
+
+        {/* The digest reads first — it is the reason the event exists. */}
+        {!showDigest && <EventModal />}
 
         {showSettings && (
           <div className="modal-backdrop" onClick={() => setShowSettings(false)}>

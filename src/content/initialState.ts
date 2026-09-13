@@ -15,7 +15,7 @@ import { NPC_DEFINITIONS } from './npcs';
 import { RESOURCE_LIST } from './resources';
 import { createInitialDistricts, createInitialFacilities, TOTAL_START_POPULATION } from './world';
 
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 /** Faction opinion and power at game start. The player is nobody to all of them. */
 const INITIAL_FACTION_SETUP: Record<FactionId, { opinion: number; power: number; stability: number }> = {
@@ -184,6 +184,8 @@ export function createNewGame(seed?: number, playerName = 'Syl'): GameState {
     retinue: ['caren', 'mira', 'vesper', 'lyra', 'sylvie'],
     firedEvents: [],
     scheduled: [],
+    pendingEvents: [],
+    eventHistory: {},
     lastDigest: [],
     completedQuests: [],
     gallery: [],

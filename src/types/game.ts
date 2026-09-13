@@ -55,6 +55,21 @@ export interface GameState {
   /** Ids of events already fired, for non-repeatable gating. */
   firedEvents: string[];
   scheduled: ScheduledEvent[];
+  /**
+   * Narrative events selected but not yet answered, oldest first.
+   *
+   * Persisted rather than session-local: an unanswered question is a piece of
+   * the world's state, and closing the app must not make it go away.
+   */
+  pendingEvents: string[];
+  /**
+   * Event id → the day it was last answered, for repeatable cooldowns.
+   *
+   * Separate from `firedEvents`, which answers "has this ever happened" for
+   * one-shot gating; this answers "how long ago", which is what a repeatable
+   * event needs.
+   */
+  eventHistory: Record<string, number>;
 
   /** The most recent day-advance digest, shown after Next Day. */
   lastDigest: DigestEntry[];

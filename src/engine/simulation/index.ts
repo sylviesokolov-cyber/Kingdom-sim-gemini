@@ -22,6 +22,7 @@ import {
   type ConsumptionResult,
 } from '../economy';
 import { activePerks, dailyRelationshipDrift, perkMultiplier } from '../relationships';
+import { dueScheduledEvents, selectDailyEvent } from '../events';
 
 export interface DayResult {
   state: GameState;
@@ -525,12 +526,26 @@ export function simulateDay(state: GameState, interactedToday: string[] = []): D
   // 12 — factions
   const factions = driftFactions(state.factions, kingdom, perks);
 
-  // 15 — scheduled consequences come due
-  const due = state.scheduled.filter((s) => s.fireOnDay <= day);
+  // 15 — events. Scheduled consequences come due first and always land; the
+  // ambient roll only happens on a morning with nothing already waiting, so
+  // the world asks one question at a time.
   const remaining = state.scheduled.filter((s) => s.fireOnDay > day);
-  for (const s of due) {
-    digest.push({ stage: 'events', message: `Something you set in motion has arrived.`, tone: 'neutral' });
-    void s;
+
+  const scheduledDue = dueScheduledEvents(state, day);
+  let pendingEvents = [...state.pendingEvents, ...scheduledDue.map((e) => e.id)];
+
+  for (const event of scheduledDue) {
+    digest.push({
+      stage: 'events',
+      message: `${event.title} — something you set in motion has arrived.`,
+      tone: 'neutral',
+    });
+  }
+
+  const ambient = selectDailyEvent(state, rng.fork('events'), pendingEvents);
+  if (ambient) {
+    pendingEvents = [...pendingEvents, ambient.id];
+    digest.push({ stage: 'events', message: `${ambient.title} — someone is waiting on you.`, tone: 'neutral' });
   }
 
   const nextState: GameState = {
@@ -543,6 +558,7 @@ export function simulateDay(state: GameState, interactedToday: string[] = []): D
     facilities: production.facilities,
     market,
     scheduled: remaining,
+    pendingEvents,
     lastDigest: digest,
   };
 

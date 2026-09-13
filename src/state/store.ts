@@ -17,6 +17,7 @@ import { applyPlayerTrade, buyPrice, sellPrice } from '../engine/economy';
 import { canPromoteEstate, promoteEstate } from '../engine/progression';
 import { applyEffect } from '../engine/effects';
 import { completeTrial, jobEffect } from '../engine/career';
+import { eventById, resolveEventChoice } from '../engine/events';
 import { pullCost, resolveMultiPull } from '../engine/gacha';
 import { createRng } from '../engine/rng';
 import { clearSave, loadSave, writeSave } from './save';
@@ -47,6 +48,8 @@ interface UiState {
   /** Talk counts per npc today, for the diminishing-returns pass. */
   talksToday: Record<string, number>;
   lastPullResults: PullResult[] | null;
+  /** The outcome text of the event just answered, held until dismissed. */
+  eventOutcome: string | null;
 }
 
 export interface GameStore {
@@ -76,6 +79,8 @@ export interface GameStore {
   petitionEstate: () => void;
   attemptTrial: (trialId: string) => void;
   summon: (banner: BannerDefinition, count: number) => void;
+  answerEvent: (eventId: string, choiceId: string) => void;
+  dismissEventOutcome: () => void;
 }
 
 let toastId = 0;
@@ -88,6 +93,7 @@ function initialUi(): UiState {
     interactedToday: [],
     talksToday: {},
     lastPullResults: null,
+    eventOutcome: null,
   };
 }
 
@@ -477,6 +483,33 @@ export const useGameStore = create<GameStore>((set, get) => ({
     get().save();
   },
 
+  /* ---------------------------------------------------------------- */
+  answerEvent(eventId, choiceId) {
+    const { game, ui } = get();
+    const result = resolveEventChoice(game, eventId, choiceId);
+
+    if (!result.ok) {
+      get().pushToast(result.reason ?? 'You cannot do that.', 'bad');
+      return;
+    }
+
+    // Answered, so it leaves the queue whatever else it changed.
+    const next: GameState = {
+      ...result.state,
+      pendingEvents: result.state.pendingEvents.filter((id) => id !== eventId),
+    };
+
+    set({ game: next, ui: { ...ui, eventOutcome: result.outcome } });
+    for (const note of result.notes.slice(1)) {
+      get().pushToast(note.message, note.tone);
+    }
+    get().save();
+  },
+
+  dismissEventOutcome() {
+    set((s) => ({ ui: { ...s.ui, eventOutcome: null } }));
+  },
+
   summon(banner, count) {
     const { game, ui } = get();
     const cost = pullCost(banner, count);
@@ -555,6 +588,12 @@ export const selectActiveNpc = (s: GameStore) => s.game.npcs[s.game.activeCompan
 export const selectActiveNpcDef = (s: GameStore) => NPCS_BY_ID[s.game.activeCompanionId];
 export const selectPerks = (s: GameStore) => activePerks(s.game.npcs);
 export const selectDigest = (s: GameStore): DigestEntry[] => s.game.lastDigest;
+
+/** The question the world is currently waiting on, oldest first. */
+export const selectPendingEvent = (s: GameStore) => {
+  const id = s.game.pendingEvents[0];
+  return id ? (eventById(id) ?? null) : null;
+};
 
 export const selectBountyRate = (s: GameStore) =>
   perkMultiplier(activePerks(s.game.npcs), 'bounty_rate');

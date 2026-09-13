@@ -4,12 +4,14 @@
 > `[x]` verified · `[~]` partial/foundation · `[ ]` planned. **Nothing else.**
 > Never mark `[x]` without having actually run the check.
 
-**Current phase:** Phase 5 — Career tracks (partial; brought forward). Phases 0–2
-complete, Phase 3 partial.
-**Last updated:** 2026-09-12 (career progression made reachable for the first
-time — rank trials, a shared effect applier, real attributes and throne routes;
-see the change-log entry and `docs/design/GAME_DESIGN_ANALYSIS.md`. Earlier the
-same day: the top HUD's bar is gone — its chips float over the art — and an original gilt icon set replaces lucide across the HUD, dock and Home rail; merged to the base branch at `398708e`, CI and Pages deploy both green)
+**Current phase:** Event engine (reordered to first per
+`docs/design/GAME_DESIGN_ANALYSIS.md` §5). Phases 0–2 complete, Phase 3 partial,
+Phase 5 partial.
+**Last updated:** 2026-09-13 (the narrative event engine — the world now
+interrupts the player to ask a question. 24 authored events, seeded weighted
+selection, delayed consequences, an event modal. See the change-log entry.
+Previously: career progression made reachable — rank trials, a shared effect
+applier, real attributes and throne routes)
 
 ---
 
@@ -260,6 +262,63 @@ Peasant forever, on every seed, indefinitely.
 
 ---
 
+## Event engine — COMPLETE (first pass)
+
+Brought ahead of the remaining simulation work per `GAME_DESIGN_ANALYSIS.md` §5:
+everything it needed already existed and was unused, and it is the source of the
+standing that progression was starved of.
+
+- [x] `engine/events`: `eligibleEvents`, `selectDailyEvent`, `dueScheduledEvents`,
+      `choiceAvailability`, `resolveEventChoice`. Pure — the rng and the day
+      arrive as arguments.
+- [x] 24 authored narrative events (`src/content/events/narrative.ts`), each
+      naming a real character and reading real state. Every choice writes a
+      flag; a test enforces it, and enforces the `<domain>.<subject>_<verb>`
+      naming from `STORY.md` §3.
+- [x] Delayed consequences: six of the 24 exist only as follow-ups scheduled by
+      an earlier choice (`Effect.scheduled`, which was implemented and never
+      used). `scheduledOnly` keeps them out of the ambient pool so a day-20
+      decision's retaliation cannot arrive on day 21.
+- [x] Day pipeline stage 15: scheduled events come due and always land; the
+      ambient roll (45%) is suppressed entirely while a question is unanswered.
+- [x] `pendingEvents` and `eventHistory` on `GameState`, migrated at
+      `SAVE_VERSION` 4. An unanswered event survives reload.
+- [x] Event modal with locked choices shown, not hidden, each carrying the
+      reason from `evaluatePrerequisite`.
+- [x] 30 tests in `tests/narrativeEvents.test.ts`, including content-integrity
+      checks (every npc/resource/faction/scheduled id resolves) that a human
+      reviewer cannot do by eye across 24 events.
+
+### Verified by probe — what this does to standing
+150 in-world days on four seeds through the real engine, working the best
+available job and answering every event with the first open choice:
+
+| | standing at day 150 | from events | from jobs | events answered | distinct |
+|---|---|---|---|---|---|
+| with events | 543–711 | 282–456 | 355–361 | 14–23 | 8–10 |
+| without | 226 | — | 326 | — | — |
+
+Events roughly **double** standing income and, unlike job standing, do not
+decay with repetition. That is the intended fix for the bottleneck below.
+
+**The probe also found a real defect and it was fixed here.** Before cooldowns,
+the same run answered 46–60 events of only 8–10 distinct ones: the four
+repeatable events re-fired every few days because their premise (high unrest, low
+public health) stays true for weeks. `cooldownDays` was added to
+`EventDefinition` and the ratio is now near 1:1.
+
+**Not playtested by a human.** These are engine probes and a scripted browser
+check, not play.
+
+**Left undone:** the probe still ends at Peasant on every seed, because Villager
+is gated on career rank 2 and the probe does not attempt rank trials — standing
+was not the only blocker, and this fixes only the standing half. The pool is also
+thin at the top: most of the 24 are gated on bonds, careers or estates, so a
+player who does not bond or advance sees the same 8–10. Events do not yet grant
+career XP toward ranks 4–5, where the job pools are thinnest.
+
+---
+
 ## Known issues
 
 - [ ] **Deep winter is punishing.** A hands-off playthrough sees welfare fall
@@ -269,18 +328,14 @@ Peasant forever, on every seed, indefinitely.
       tools to mitigate it (stockpiling incentives, decrees, Caren's granary
       perks, kingdom investment) land in Phases 4 and 11. Re-tune then, not
       before — tuning it down now would flatten the season.
-- [ ] **Standing is now the progression bottleneck, and it has one source.**
-      With careers reachable, the thing that gates the estate ladder is
-      standing points, which come almost entirely from jobs — and job standing
-      has sharply diminishing returns by design. A merchant probe reached
-      Burgher on day 141 mostly waiting on standing. Standing needs to come
-      from deeds, quests and events, which means the event and story engines
-      are also the progression fix. See `docs/design/GAME_DESIGN_ANALYSIS.md` §2.4.
-- [ ] **No authored narrative events exist.** `EventDefinition`, `EventChoice`,
-      `firedEvents`, `scheduled` and now `applyEffect` are all in place, and
-      `src/content/events/` holds only `LiveEventDefinition` (banner
-      advertising, explicitly not the narrative unit). The world simulates and
-      never interrupts the player to ask a question.
+- [~] **Standing had one source; it now has two.** Events roughly double
+      standing income and do not decay with repetition (see the probe table
+      above). Partial rather than done: quests and deeds are still not a
+      source, and the estate ladder's upper rungs (Burgher 800, Gentry 2000)
+      have not been probed against the new income because career rank gates
+      them first. See `docs/design/GAME_DESIGN_ANALYSIS.md` §2.4.
+- [x] ~~No authored narrative events exist.~~ 24 authored, with an engine,
+      delayed consequences and a modal. The world now interrupts the player.
 - [ ] **`driftFactions` conflates faction mood with opinion of the player.** A
       faction's opinion of the player drifts daily from kingdom state — the
       Guilds like you more because prosperity is high. `FactionState` should
@@ -346,6 +401,7 @@ Recorded so no future session relitigates them:
 | 2026-09-12 | `398708e` | pass | 87 pass | pass | **green** | HUD bar removed + original icon set, fast-forwarded onto the base branch — CI run 34719926595, deploy run 34719926600 |
 | 2026-09-12 | `7a159e4` | pass | 115 pass | pass | **green** | Career progression made reachable — rank trials, `applyEffect`, real attributes, throne routes. Browser-verified at 740x360/900x420. CI run 34722170630 |
 | 2026-09-12 | `ed665b9` | pass | 115 pass | pass | **green** | Design analysis + doc updates — CI run 34722625325. (The job-level API reported its Test step in progress for several minutes after the run had in fact completed; the run-level status is the reliable one.) |
+| 2026-09-13 | _pending_ | pass | 145 pass | pass | pending | Narrative event engine — 24 events, delayed consequences, event modal. Browser-verified at 740×360/900×420/1280×600. CI not yet observed on this commit. |
 | 2026-09-12 | `2fc95c3` | pass | 115 pass | pass | **green** | Merged `claude/kingdom-simulator-progression-a9i7uk` into the default branch `claude/kingdom-simulator-bonding-0288cn` as a clean fast-forward (0 commits behind, no conflict). Re-verified locally after the merge before pushing; CI run 34723724967 and Pages deploy run 34723725024 both green on the merged commit. |
 
 Run `82e5cfd` failed on a missing `@types/node`, fixed in `f7fc550`. Only the
@@ -398,6 +454,55 @@ Driven with Playwright at 900x420 and 740x360, landscape.
 ---
 
 ## Change log
+
+### 2026-09-13 — The narrative event engine; the world asks its first question
+
+`EventDefinition`, `EventChoice`, `Prerequisite`, `Effect`, `firedEvents`,
+`scheduled`, `evaluatePrerequisite` and `applyEffect` were all in place and
+connected to nothing. This is the four operations that connect them, plus the
+content that makes them mean something.
+
+- **`src/engine/events/index.ts`** — `eligibleEvents`, `selectDailyEvent`,
+  `dueScheduledEvents`, `choiceAvailability`, `resolveEventChoice`. Pure: the
+  rng and the day arrive as arguments, per CLAUDE.md §5.1. The ambient roll uses
+  `rng.fork('events')`, which consumes nothing from the parent stream, so no
+  existing simulation test changed its expected values.
+- **`src/content/events/narrative.ts`** — 24 events. The eligibility
+  prerequisite is the premise, not a gate bolted in front of one: the cistern
+  event exists *because* unrest is over 55, and Caren's short-ration scene
+  exists because she trusts you enough to make you complicit. Every choice
+  writes a flag, enforced by test.
+- **Delayed consequences are real for the first time.** `Effect.scheduled` was
+  implemented and applied and nothing had ever scheduled anything. Six events
+  now exist only as follow-ups: keep the Ague quiet and it comes back on day
+  +9; help Mira prove the sluices were closed and someone searches her rooms on
+  day +14. A new `scheduledOnly` flag keeps them out of the ambient pool —
+  without it their premise flag makes them eligible the very next morning,
+  which would read as the world's memory being broken rather than long.
+- **Pipeline stage 15** replaces its placeholder ("Something you set in motion
+  has arrived", pushed for every due entry and doing nothing). Scheduled events
+  always land; the ambient roll is suppressed entirely while a question is
+  unanswered, so the world asks one thing at a time.
+- **`pendingEvents` and `eventHistory`** on `GameState`, `SAVE_VERSION` 3 → 4
+  with migration. An unanswered event is world state and survives reload.
+- **`EventModal`** — no close button on the scene (an event is answered, not
+  dismissed), locked choices shown with their reason rather than hidden, and an
+  outcome panel afterwards. The digest renders first, since it is usually why
+  the event exists.
+- **A defect the probe found, not the reading.** The first 150-day probe
+  answered 46–60 events of only 8–10 distinct ones — the repeatable events
+  re-fire every few days because "unrest is high" stays true for weeks.
+  `cooldownDays` was added to `EventDefinition` and the ratio is now near 1:1.
+- Verified: `npm run typecheck`, 145 tests (30 new), `npm run build` all pass.
+  Browser-checked against the production preview build at 740×360, 900×420 and
+  1280×600 — the modal fits with all three choices above the fold at every
+  size, no horizontal overflow, no console errors. A choice was taken through
+  the real UI: standing rose 0 → 22, `ashes.served_the_dole` was written, the
+  event was marked fired, and the result survived a reload. (The only console
+  errors are this sandbox's network policy blocking the Google Fonts CDN.)
+- **Left undone:** events grant no career XP toward ranks 4–5; quests and deeds
+  are still not a standing source; the reachable pool is thin for a player who
+  does not bond or advance a career. No human has played this.
 
 ### 2026-09-12 — Progression branch merged to the default branch
 `claude/kingdom-simulator-progression-a9i7uk` merged into

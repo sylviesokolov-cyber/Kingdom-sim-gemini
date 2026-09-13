@@ -181,6 +181,26 @@ export interface EventDefinition {
   weight: number;
   /** Can this event fire more than once per playthrough? */
   repeatable: boolean;
+  /**
+   * Days that must pass before a repeatable event can be asked again.
+   *
+   * Without this a repeatable event whose premise stays true — a cistern queue
+   * in a kingdom that is durably unrestful — comes back every few days and the
+   * world stops reading as responsive and starts reading as a loop. Ignored
+   * for non-repeatable events, which are gated by `firedEvents` instead.
+   */
+  cooldownDays?: number;
+  /**
+   * Never selected as the day's ambient event — it arrives only because an
+   * earlier choice scheduled it.
+   *
+   * Delayed consequences need this. Their premise is a flag that the
+   * originating choice sets, so without it the retaliation for a thing you did
+   * on day 20 becomes eligible on day 21 and can fire before the day 34 it was
+   * scheduled for, which reads as the world's memory being broken rather than
+   * long.
+   */
+  scheduledOnly?: boolean;
   choices: EventChoice[];
 }
 
